@@ -1,0 +1,13 @@
+name: dmxCanvas GitHub Actions CI Build
+
+on: ["push", "pull request"]
+
+jobs:
+  linux-deb:
+    runs-on: ubuntu-24.04
+    env:
+      SOURCE_DIR:   ${{ github.workspace }}
+
+    steps:
+      - name: Test
+        run: echo Test
