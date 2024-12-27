@@ -1,6 +1,6 @@
 name: dmxCanvas GitHub Actions CI Build
 
-on: ["push", "pull request"]
+on: ["push", "pull_request"]
 
 jobs:
   linux-deb:
