@@ -12,12 +12,16 @@ SacnServer::SacnServer() {
     QHBoxLayout* layout = new QHBoxLayout();
     setLayout(layout);
 
-    counterLabel = new QLabel("No packets received.");
+    counterLabel = new QLabel("No packets were received in sACN universe " + QString::number(universe) + ".");
     layout->addWidget(counterLabel);
+
+    QPushButton *setUniverseButton = new QPushButton("Set sACN Universe");
+    connect(setUniverseButton, &QPushButton::clicked, this, &SacnServer::setUniverse);
+    layout->addWidget(setUniverseButton);
 
     socket = new QUdpSocket();
     socket->bind(QHostAddress::AnyIPv4, 5568);
-    socket->joinMulticastGroup(QHostAddress("239.255.0.1"));
+    socket->joinMulticastGroup(universeToHostAddress(universe));
     connect(socket, &QUdpSocket::readyRead, this, &SacnServer::processPendingDatagrams);
 }
 
@@ -59,7 +63,7 @@ void SacnServer::processPendingDatagrams() {
             && (data[42] == (char)0x00)
             && (data[43] == (char)0x02)
             // Universe
-            //&& (data.mid(113, 2).toInt(nullptr, 16) == 1)
+            && (data.mid(113, 2).toInt(nullptr, 16) == universe)
             // DMP LAYER
             // Vector
             && (data[117] == (char)0x02)
@@ -84,5 +88,27 @@ void SacnServer::processPendingDatagrams() {
             qDebug() << "Received invalid data.";
         }
     }
-    counterLabel->setText("Received Packets: " + QString::number(receivedPackets));
+    counterLabel->setText("Received Packets on Universe " + QString::number(universe) + ": " + QString::number(receivedPackets));
+}
+
+void SacnServer::setUniverse() {
+    bool ok = true;
+    int newUniverse = QInputDialog::getInt(this, "Set sACN Universe", "Please insert the wanted sACN Universe. The Universe has to be between 1 and 63999.", universe, 1, 63999, 1, &ok);
+    if (!ok) {
+        return;
+    }
+    socket->leaveMulticastGroup(universeToHostAddress(universe));
+    universe = newUniverse;
+    socket->joinMulticastGroup(universeToHostAddress(universe));
+    qDebug() << "Set sACN Universe to " << universe << " and Multicast address to " << universeToHostAddress(universe).toString() << ".";
+    receivedPackets = 0;
+    counterLabel = new QLabel("No packets were received in sACN universe " + QString::number(universe) + ".");
+}
+
+QHostAddress SacnServer::universeToHostAddress(int universeId) {
+    QString address = "239.255.";
+    address += QString::number(universeId / 256);
+    address += ".";
+    address += QString::number(universeId % 256);
+    return QHostAddress(address);
 }
