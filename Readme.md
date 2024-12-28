@@ -5,7 +5,7 @@ It currently only runs on Ubuntu Linux, however, AppImage and Windows support is
 
 See the [Releases page](https://github.com/arneBersch/dmxCanvas/releases/) to download the latest version.
 
-You can also find a [Manual]{/docs/manual.md} for dmxCanvas.
+You can also find a [Manual](/docs/manual.md) for dmxCanvas.
 
 ## Features
 - Unlimited Virtual Beams with Pan, Tilt, Zoom and CMY Color Mixing.
