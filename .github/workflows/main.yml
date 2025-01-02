@@ -27,7 +27,7 @@ jobs:
       - name: Create Debian Package
         run: |
           cd ../build/
-          mkdir dmxCanvas-amd64/usr/local/bin
+          mkdir -p dmxCanvas-amd64/usr/local/bin
           cp ../src/dmxCanvas dmxCanvas-amd64/usr/local/bin
           dpkg-deb --build --root-owner-group dmxCanvas-amd64
 
