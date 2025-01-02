@@ -6,9 +6,12 @@ jobs:
   linux:
     runs-on: ubuntu-24.04
     env:
-      SOURCE_DIR:   ${{ github.workspace }}/src
+      SOURCE_DIR:   ${{ github.workspace }}
 
     steps:
+      - name: Change Directory to src
+        run: cd src/
+
       - name: Checkout
         uses: actions/checkout@v2
         with:
