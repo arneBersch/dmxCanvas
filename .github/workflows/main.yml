@@ -3,11 +3,30 @@ name: dmxCanvas GitHub Actions CI Build
 on: ["push", "pull_request"]
 
 jobs:
-  linux-deb:
+  linux:
     runs-on: ubuntu-24.04
     env:
-      SOURCE_DIR:   ${{ github.workspace }}
+      SOURCE_DIR:   ${{ github.workspace }}/src
 
     steps:
-      - name: Test
-        run: echo Test
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+
+      - name: Create Makefile
+        run: qmake dmxCanvas.pro
+
+      - name: Run Makefile
+        run: make
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Linux
+          path: |
+            dmxCanvas*.AppImage
+            install/linux/*.deb
