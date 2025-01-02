@@ -1,0 +1,6 @@
+Package: dmxCanvas
+Version: 0.1.0
+Architecture: amd64
+Maintainer: Arne Bersch <zoeglfrex-dmx@web.de>
+Depends: libqt5widgets5t64
+Description: Open Source DMX Media Server
