@@ -24,6 +24,9 @@ jobs:
       - name: Run Makefile
         run: make
 
+      - name: List all Files
+        run: ls -a
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
