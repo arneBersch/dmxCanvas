@@ -4,14 +4,12 @@ on: ["push", "pull_request"]
 
 jobs:
   linux:
-    runs-on: ubuntu-24.04
-    env:
-      SOURCE_DIR:   ${{ github.workspace }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src
 
     steps:
-      - name: Change Directory to src
-        run: cd src/
-
       - name: Checkout
         uses: actions/checkout@v2
         with:
