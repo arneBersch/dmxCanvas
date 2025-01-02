@@ -115,7 +115,7 @@ void MainWindow::removeObject() {
             rowsToRemove.append(index.row());
         }
     }
-    std::sort(rowsToRemove.begin(), rowsToRemove.end(), std::greater{});
+    std::sort(rowsToRemove.begin(), rowsToRemove.end(), std::greater());
     if (rowsToRemove.size() <= 0) {
         return;
     }
