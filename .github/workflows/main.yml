@@ -18,21 +18,54 @@ jobs:
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
 
-      - name: Create Makefile
-        run: qmake dmxCanvas.pro
-
-      - name: Run Makefile
-        run: make
+      - name: Compile
+        run: |
+          qmake dmxCanvas.pro
+          make
 
       - name: Create Debian Package
+        working-directory: build
         run: |
-          cd ../build/
           mkdir -p dmxCanvas-amd64/usr/local/bin
           cp ../src/dmxCanvas dmxCanvas-amd64/usr/local/bin
           dpkg-deb --build --root-owner-group dmxCanvas-amd64
 
-      - name: Upload Artifact
+      - name: Upload Debian Package
         uses: actions/upload-artifact@v4
         with:
           name: dmxCanvas-amd64.deb
           path: build/dmxCanvas-amd64.deb
+
+      - name: Create AppImage
+        working-directory: build
+        run: |
+          wget -O deploy.AppImage https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+          chmod +x deploy.AppImage
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/Qt/6.2.0/gcc_64/lib/
+          ./deploy.AppImage dmxCanvas -appimage -no-translations -bundle-non-qt-libs
+
+      - name: Upload AppImage
+        uses: actions/upload-artifacts@v4
+        with:
+          name: dmxCanvas-amd64.AppImage
+          path: build/dmxCanvas*.AppImage
+
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: src
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+
+      - name: Compile
+        run: |
+             qmake dmxCanvas.pro
+             nmake
