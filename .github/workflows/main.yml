@@ -39,6 +39,8 @@ jobs:
       - name: Create AppImage
         working-directory: build
         run: |
+          add-apt-repository universe
+          apt install libfuse2
           wget -O deploy.AppImage https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
           chmod +x deploy.AppImage
           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/Qt/6.2.0/gcc_64/lib/
