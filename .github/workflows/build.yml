@@ -40,6 +40,8 @@ jobs:
       - name: Create AppImage
         working-directory: build
         run: |
+          sudo add-apt-repository universe
+          sudo apt install libfuse2
           wget -O deploy.AppImage https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
           chmod +x deploy.AppImage
           ./deploy.AppImage dmxCanvas -appimage -no-translations -bundle-non-qt-libs
