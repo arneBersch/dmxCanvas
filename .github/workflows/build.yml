@@ -22,6 +22,7 @@ jobs:
         run: |
           qmake dmxCanvas.pro
           make
+          make install DESTDIR=AppDir
           make clean
 
       - name: Create Debian Package
@@ -38,13 +39,7 @@ jobs:
           path: build/dmxCanvas-amd64.deb
 
       - name: Create AppImage
-        working-directory: build
-        run: |
-          sudo add-apt-repository universe
-          sudo apt install libfuse2
-          wget -O deploy.AppImage https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
-          chmod +x deploy.AppImage
-          ./deploy.AppImage dmxCanvas -appimage -no-translations -bundle-non-qt-libs
+        uses: AppImageCrafters/build-appimage-action@master
 
       - name: Upload AppImage
         uses: actions/upload-artifact@v4
