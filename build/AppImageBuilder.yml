@@ -1,0 +1,8 @@
+version: 0.1.0
+AppDir:
+  path: AppDir
+  app_info:
+    id: dmxcanvas
+    name: dmxCanvas
+    exec: usr/bin/dmxCanvas
+  
