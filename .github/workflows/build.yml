@@ -40,6 +40,8 @@ jobs:
 
       - name: Create AppImage
         uses: AppImageCrafters/build-appimage-action@master
+        with:
+          recipe: build/AppImageBuilder.yml
 
       - name: Upload AppImage
         uses: actions/upload-artifact@v4
