@@ -7,5 +7,5 @@ AppDir:
     exec: usr/bin/dmxCanvas
     version: latest
 
-  AppImage:
-    arch: x68_64
+  apt:
+    arch: amd64
