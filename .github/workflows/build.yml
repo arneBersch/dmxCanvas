@@ -18,8 +18,8 @@ jobs:
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
-        #with:
-        #  version: ${{ env.QT_VERSION }}
+        with:
+          version: ${{ env.QT_VERSION }}
 
       - name: Compile
         run: |
@@ -63,8 +63,8 @@ jobs:
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v2
-        with:
-          version: ${{ env.QT_VERSION }}
+        #with:
+        #  version: ${{ env.QT_VERSION }}
 
       - name: Install NSIS
         run: |
