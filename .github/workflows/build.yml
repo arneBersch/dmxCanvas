@@ -85,6 +85,7 @@ jobs:
              windeployqt bin/dmxCanvas.exe -qmldir="assets\\qml" --compiler-runtime
              mkdir dmxCanvas
              move bin dmxCanvas
+             cd deploy\windows\nsis
 
       - name: Create installer
         run: |
