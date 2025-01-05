@@ -85,12 +85,12 @@ jobs:
              windeployqt bin/dmxCanvas.exe -qmldir="assets\\qml" --compiler-runtime
              mkdir dmxCanvas
              move bin dmxCanvas
-             cd deploy\windows\nsis
+             cd \deploy\windows\nsis
 
       - name: Create installer
         run: |
-             move dmxCanvas deploy\windows\nsis\
-             cd deploy\windows\nsis
+             move dmxCanvas \deploy\windows\nsis\
+             cd \deploy\windows\nsis
              makensis /X"SetCompressor /FINAL lzma" setup.nsi
              ren *.exe dmxCanvas.exe
 
