@@ -4,7 +4,7 @@ on: ["push", "pull_request"]
 
 jobs:
   linux:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     defaults:
       run:
         working-directory: src
@@ -93,7 +93,7 @@ jobs:
 
       - name: Make installer
         run: |
-             move bin/dmxCanvas deploy\windows\nsis\
+             move bin\dmxCanvas deploy\windows\nsis\
              cd deploy\windows\nsis
              makensis /X"SetCompressor /FINAL lzma" setup.nsi
              ren *.exe dmxCanvas.exe
