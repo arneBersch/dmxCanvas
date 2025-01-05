@@ -6,4 +6,6 @@ AppDir:
     name: dmxCanvas
     exec: usr/bin/dmxCanvas
     version: latest
-  
+
+  AppImage:
+    arch: x68_64
