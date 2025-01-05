@@ -2,5 +2,6 @@
 Type=Application
 Name=dmxCanvas
 Comment=Open Source DMX Media Server
+Icon=icon
 Exec=dmxCanvas
 Categories=AudioVideo;
