@@ -27,19 +27,6 @@ jobs:
           make install INSTALL_ROOT=AppDir
           make clean
 
-      - name: Create Debian Package
-        working-directory: build
-        run: |
-          mkdir -p dmxCanvas-amd64/usr/local/bin
-          cp ../src/dmxCanvas dmxCanvas-amd64/usr/local/bin
-          dpkg-deb --build --root-owner-group dmxCanvas-amd64
-
-      - name: Upload Debian Package
-        uses: actions/upload-artifact@v4
-        with:
-          name: dmxCanvas-amd64.deb
-          path: build/dmxCanvas-amd64.deb
-
       - name: Create AppImage
         run: |
           sudo add-apt-repository universe
@@ -49,11 +36,15 @@ jobs:
           chmod +x linuxdeploy*.AppImage
           ./linuxdeploy-x86_64.AppImage --appdir AppDir -e dmxCanvas --plugin qt -d ../build/dmxCanvas.desktop -i ../src/resources/icon.png --output appimage
 
+      - run: |
+          ls
+          ls AppDir/
+
       - name: Upload AppImage
         uses: actions/upload-artifact@v4
         with:
           name: dmxCanvas-amd64.AppImage
-          path: dmxCanvas*.AppImage
+          path: AppDir/dmxCanvas*.AppImage
 
   windows:
     runs-on: windows-latest
