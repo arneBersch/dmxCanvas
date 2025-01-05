@@ -39,7 +39,7 @@ jobs:
           path: build/dmxCanvas-amd64.deb
 
       - name: Download Qt Library
-        run: apt install libqt6widgets6t64
+        run: sudo apt install libqt6widgets6t64
 
       - name: Create AppImage
         uses: AppImageCrafters/build-appimage-action@master
