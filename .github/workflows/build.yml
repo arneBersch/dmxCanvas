@@ -57,7 +57,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
         with:
           submodules: recursive
 
@@ -93,7 +93,7 @@ jobs:
              ren *.exe dmxCanvas.exe
 
       - name: Upload installer
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v4
         with:
           name: dmxCanvas.exe
           path: deploy/windows/nsis/dmxCanvas.exe
