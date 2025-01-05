@@ -57,15 +57,43 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@master
         with:
           submodules: recursive
 
+      - name: Install NSIS
+        run: |
+             Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
+             scoop bucket add extras
+             scoop install nsis
+
       - name: Install Qt
-        uses: jurplel/install-qt-action@v2
+        uses: jurplel/install-qt-action@master
 
       - name: Compile
         run: |
              qmake dmxCanvas.pro
-             nmake release
+             nmake
              nmake clean
+
+      - name: Deploy
+        run: |
+             mkdir bin
+             move release/dmxCanvas.exe bin
+             windeployqt bin/dmxCanvas.exe -qmldir="assets\\qml" --compiler-runtime
+             mkdir dmxCanvas
+             move bin "dmxCanvas"
+             xcopy deploy\windows\resources\icon.ico "dmxCanvas"
+
+      - name: Make installer
+        run: |
+             move "dmxCanvas" deploy\windows\nsis\
+             cd deploy\windows\nsis
+             makensis /X"SetCompressor /FINAL lzma" setup.nsi
+             ren *.exe dmxCanvas.exe
+
+      - name: Upload installer
+        uses: actions/upload-artifact@master
+        with:
+          name: dmxCanvas.exe
+          path: deploy/windows/nsis/dmxCanvas.exe
