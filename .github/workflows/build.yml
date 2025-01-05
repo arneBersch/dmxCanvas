@@ -22,7 +22,6 @@ jobs:
         run: |
           qmake dmxCanvas.pro
           make
-          make install DESTDIR=AppDir
           make clean
 
       - name: Create Debian Package
@@ -38,19 +37,18 @@ jobs:
           name: dmxCanvas-amd64.deb
           path: build/dmxCanvas-amd64.deb
 
-      - name: Download Qt Library
-        run: sudo apt install libqt6widgets6t64
-
       - name: Create AppImage
-        uses: AppImageCrafters/build-appimage-action@master
-        with:
-          recipe: build/AppImageBuilder.yml
+        run: |
+          wget -O deploy.AppImage https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+          chmod +x deploy.AppImage
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/Qt/6.2.0/gcc_64/lib/
+          ./deploy.AppImage dmxCanvas -appimage -no-translations
 
       - name: Upload AppImage
         uses: actions/upload-artifact@v4
         with:
           name: dmxCanvas-amd64.AppImage
-          path: build/dmxCanvas*.AppImage
+          path: dmxCanvas*.AppImage
 
   windows:
     runs-on: windows-latest
