@@ -92,7 +92,7 @@ jobs:
 
       - name: Make installer
         run: |
-             move "dmxCanvas" deploy\windows\nsis\
+             move bin/dmxCanvas deploy\windows\nsis\
              cd deploy\windows\nsis
              makensis /X"SetCompressor /FINAL lzma" setup.nsi
              ren *.exe dmxCanvas.exe
