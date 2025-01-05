@@ -36,15 +36,11 @@ jobs:
           chmod +x linuxdeploy*.AppImage
           ./linuxdeploy-x86_64.AppImage --appdir AppDir -e dmxCanvas --plugin qt -d ../build/dmxCanvas.desktop -i ../src/resources/icon.png --output appimage
 
-      - run: |
-          ls
-          ls AppDir/
-
       - name: Upload AppImage
         uses: actions/upload-artifact@v4
         with:
           name: dmxCanvas-amd64.AppImage
-          path: AppDir/dmxCanvas*.AppImage
+          path: src/dmxCanvas*.AppImage
 
   windows:
     runs-on: windows-latest
