@@ -68,7 +68,7 @@ jobs:
              scoop install nsis
 
       - name: Install Qt
-        uses: jurplel/install-qt-action@master
+        uses: jurplel/install-qt-action@v2
 
       - name: Compile
         run: |
