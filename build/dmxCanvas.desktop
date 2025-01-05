@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=dmxCanvas
+Comment=Open Source DMX Media Server
+Exec=dmxCanvas
+Categories=AudioVideo;
