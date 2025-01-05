@@ -1,6 +1,7 @@
 name: dmxCanvas GitHub Actions CI Build
-
-on: ["push", "pull_request"]
+on: [ push, pull_request ]
+env:
+  QT_VERSION: "6.2.*"
 
 jobs:
   linux:
@@ -18,7 +19,7 @@ jobs:
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
-          version: '6.2.*'
+          version: ${{ env.QT_VERSION }}
 
       - name: Compile
         run: |
@@ -39,7 +40,7 @@ jobs:
       - name: Upload AppImage
         uses: actions/upload-artifact@v4
         with:
-          name: dmxCanvas-amd64.AppImage
+          name: dmxCanvas.AppImage
           path: src/dmxCanvas*.AppImage
 
   windows:
@@ -62,6 +63,8 @@ jobs:
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v2
+        with:
+          version: ${{ env.QT_VERSION }}
 
       - name: Install NSIS
         run: |
@@ -81,11 +84,11 @@ jobs:
              move release/dmxCanvas.exe bin
              windeployqt bin/dmxCanvas.exe -qmldir="assets\\qml" --compiler-runtime
              mkdir dmxCanvas
-             move bin "dmxCanvas"
+             move bin dmxCanvas
 
-      - name: Make installer
+      - name: Create installer
         run: |
-             move bin\dmxCanvas deploy\windows\nsis\
+             move dmxCanvas/bin deploy\windows\nsis\
              cd deploy\windows\nsis
              makensis /X"SetCompressor /FINAL lzma" setup.nsi
              ren *.exe dmxCanvas.exe
