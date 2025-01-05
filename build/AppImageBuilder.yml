@@ -5,4 +5,5 @@ AppDir:
     id: dmxcanvas
     name: dmxCanvas
     exec: usr/bin/dmxCanvas
+    version: latest
   
