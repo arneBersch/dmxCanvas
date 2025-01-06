@@ -11,6 +11,8 @@
 
 #include <QtWidgets>
 
+#include "server/sacnserver.h"
+
 struct Object {
     QString name = QString();
     int channel = 1;
@@ -25,7 +27,7 @@ enum {
 
 class ObjectList : public QAbstractTableModel {
 public:
-    ObjectList(QString softwareVersion);
+    ObjectList(SacnServer *sacn, QString softwareVersion);
     void newFile();
     void openFile(QString filename);
     void saveFile(QString filename);
@@ -40,6 +42,7 @@ public:
 private:
     QList<Object*> objects;
     QString version;
+    SacnServer* sacnServer;
 };
 
 #endif // OBJECTLIST_H

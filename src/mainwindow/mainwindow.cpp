@@ -90,7 +90,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     layout->addWidget(sacnServer);
 
     objectTable = new QTableView();
-    objectList = new ObjectList(VERSION);
+    objectList = new ObjectList(sacnServer, VERSION);
     objectTable->setModel(objectList);
     objectTable->horizontalHeader()->setStretchLastSection(true);
     objectTable->verticalHeader()->hide();

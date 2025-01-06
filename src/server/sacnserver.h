@@ -17,14 +17,15 @@ class SacnServer : public QWidget {
 public:
     SacnServer();
     uint8_t dmxData[512];
+    int universe = 1;
+public slots:
+    void setUniverse(int newUniverse = -1);
 private slots:
     void processPendingDatagrams();
-    void setUniverse();
 private:
     QUdpSocket *socket;
     QLabel *counterLabel;
     unsigned long receivedPackets = 0;
-    int universe = 1;
     QHostAddress universeToHostAddress(int universe);
 };
 

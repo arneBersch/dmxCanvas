@@ -8,7 +8,8 @@
 
 #include "objectlist.h"
 
-ObjectList::ObjectList(QString softwareVersion) {
+ObjectList::ObjectList(SacnServer *sacn, QString softwareVersion) {
+    sacnServer = sacn;
     version = softwareVersion;
     objects = QList<Object*>();
 }
@@ -43,19 +44,29 @@ void ObjectList::openFile(QString filename) {
                         return;
                     }
                 }
-            } else if(fileStream.name().toString() == "Objects") {
-                qDebug() << "<Objects>";
+            } else if (fileStream.name().toString() == "Input") {
+                while (fileStream.readNextStartElement()) {
+                    if (fileStream.name().toString() == "Universe") {
+                        bool ok = true;
+                        int universe = fileStream.readElementText().toInt(&ok);
+                        if (!ok) {
+                            QMessageBox errorBox;
+                            errorBox.setText("Invalid Input Universe.");
+                            errorBox.exec();
+                            return;
+                        }
+                        sacnServer->setUniverse(universe);
+                    }
+                }
+            } else if (fileStream.name().toString() == "Objects") {
                 newFile();
                 while (fileStream.readNextStartElement()) {
                     if (fileStream.name().toString() == "Object") {
-                        qDebug() << "<Object>";
                         insertRows(rowCount(), 1);
                         while (fileStream.readNextStartElement()) {
                             if (fileStream.name().toString() == "Name") {
-                                qDebug() << "<Name>";
                                 setData(index((rowCount() - 1), ObjectListColumns::NameColumn), fileStream.readElementText());
                             } else if (fileStream.name().toString() == "Channel") {
-                                qDebug() << "<Channel>";
                                 setData(index((rowCount() - 1), ObjectListColumns::ChannelColumn), fileStream.readElementText());
                             }
                         }
@@ -89,6 +100,10 @@ void ObjectList::saveFile(QString filename) {
     fileStream.writeStartElement("Creator");
     fileStream.writeTextElement("Name", "dmxCanvas");
     fileStream.writeTextElement("Version", version);
+    fileStream.writeEndElement();
+
+    fileStream.writeStartElement("Input");
+    fileStream.writeTextElement("Universe", QString::number(sacnServer->universe));
     fileStream.writeEndElement();
 
     fileStream.writeStartElement("Objects");
