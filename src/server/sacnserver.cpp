@@ -63,7 +63,7 @@ void SacnServer::processPendingDatagrams() {
             && (data[42] == (char)0x00)
             && (data[43] == (char)0x02)
             // Universe
-            && (data.mid(113, 2).toInt(nullptr, 16) == universe)
+            && (((256 * (uint8_t)data[113]) + (uint8_t)data[114]) == universe)
             // DMP LAYER
             // Vector
             && (data[117] == (char)0x02)
@@ -84,11 +84,11 @@ void SacnServer::processPendingDatagrams() {
                     dmxData[channel] = 0;
                 }
             }
+            counterLabel->setText("Received Packets on Universe " + QString::number(universe) + ": " + QString::number(receivedPackets));
         } else {
             qDebug() << "Received invalid data.";
         }
     }
-    counterLabel->setText("Received Packets on Universe " + QString::number(universe) + ": " + QString::number(receivedPackets));
 }
 
 void SacnServer::setUniverse() {
@@ -102,7 +102,7 @@ void SacnServer::setUniverse() {
     socket->joinMulticastGroup(universeToHostAddress(universe));
     qDebug() << "Set sACN Universe to " << universe << " and Multicast address to " << universeToHostAddress(universe).toString() << ".";
     receivedPackets = 0;
-    counterLabel = new QLabel("No packets were received in sACN universe " + QString::number(universe) + ".");
+    counterLabel->setText("No packets were received in sACN universe " + QString::number(universe) + ".");
 }
 
 QHostAddress SacnServer::universeToHostAddress(int universeId) {
