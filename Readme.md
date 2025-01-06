@@ -1,24 +1,24 @@
 # dmxCanvas
 dmxCanvas is a Free and Open Source DMX Media Server software.
 
-It currently only runs on Ubuntu Linux, however, Appimage and Windows support is planned, too.
+It currently only runs on Linux (via AppImage), however Windows support is planned too.
 
 See the [Releases page](https://github.com/arneBersch/dmxCanvas/releases/) to download the latest version.
 
 ## Features
 - unlimited Virtual Beams with Pan, Tilt, Zoom and CMY Color Mixing
-- sACN (ESTA 1.31 input)
+- sACN (ANSI E1.31 input)
 - patch any Object to any DMX address
 
 ## Planned Features
 - other Virtual Beam features (like gobo, frost, prism, shutter, framing)
 - ArtNet input
-- image Viewer Objects
-- video Player Objects
+- Image viewer Objects
+- Video player Objects
+- Audio player Objects
 
 ## Known Limitations
-- input is only possible in sACN Universe 1
-- Some sACN features are not implemented yet (like priority or synchronization) and will therefore not work
+- Some sACN features (unicast, priority, synchronization, universe discovery) are not implemented yet and will therefore not work
 
 ## How to contribute
 Please DO NOT post feature requests.
