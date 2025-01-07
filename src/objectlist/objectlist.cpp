@@ -16,6 +16,7 @@ ObjectList::ObjectList(SacnServer *sacn, QString softwareVersion) {
 
 void ObjectList::newFile() {
     removeRows(0, rowCount(), QModelIndex());
+    sacnServer->setUniverse(1);
     qDebug() << "Opened new file.";
 }
 
