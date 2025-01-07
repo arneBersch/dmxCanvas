@@ -170,20 +170,6 @@ void MainWindow::openFile() {
                         return;
                     }
                 }
-            } else if (fileStream.name().toString() == "Input") {
-                while (fileStream.readNextStartElement()) {
-                    if (fileStream.name().toString() == "Universe") {
-                        bool ok = true;
-                        int universe = fileStream.readElementText().toInt(&ok);
-                        if (!ok) {
-                            QMessageBox errorBox;
-                            errorBox.setText("Invalid Input Universe.");
-                            errorBox.exec();
-                            return;
-                        }
-                        sacnServer->setUniverse(universe);
-                    }
-                }
             } else if (fileStream.name().toString() == "Objects") {
                 newFile();
                 while (fileStream.readNextStartElement()) {
@@ -196,6 +182,26 @@ void MainWindow::openFile() {
                                 objectList->setData(objectList->index((objectList->rowCount() - 1), ObjectListColumns::AddressColumn), fileStream.readElementText());
                             }
                         }
+                    }
+                }
+            } else if (fileStream.name().toString() == "Media") {
+                while (fileStream.readNextStartElement()) {
+                    if (fileStream.name().toString() == "Images") {
+                        mediaSources->setImageDirectory(fileStream.readElementText());
+                    }
+                }
+            } else if (fileStream.name().toString() == "Input") {
+                while (fileStream.readNextStartElement()) {
+                    if (fileStream.name().toString() == "Universe") {
+                        bool ok = true;
+                        int universe = fileStream.readElementText().toInt(&ok);
+                        if (!ok) {
+                            QMessageBox errorBox;
+                            errorBox.setText("Invalid Input Universe.");
+                            errorBox.exec();
+                            return;
+                        }
+                        sacnServer->setUniverse(universe);
                     }
                 }
             }
@@ -220,6 +226,7 @@ void MainWindow::newFile() {
         return;
     }
     objectList->removeRows(0, objectList->rowCount(), QModelIndex());
+    mediaSources->resetSources();
     sacnServer->setUniverse(1);
     qDebug() << "Opened new file.";
 }
@@ -252,10 +259,6 @@ void MainWindow::saveFile() {
     fileStream.writeTextElement("Version", VERSION);
     fileStream.writeEndElement();
 
-    fileStream.writeStartElement("Input");
-    fileStream.writeTextElement("Universe", QString::number(sacnServer->universe));
-    fileStream.writeEndElement();
-
     fileStream.writeStartElement("Objects");
     for (int objectRow = 0; objectRow < objectList->rowCount(); objectRow++) {
         fileStream.writeStartElement("Object");
@@ -263,6 +266,14 @@ void MainWindow::saveFile() {
         fileStream.writeTextElement("Address", objectList->data(objectList->index(objectRow, ObjectListColumns::AddressColumn), Qt::DisplayRole).toString());
         fileStream.writeEndElement();
     }
+    fileStream.writeEndElement();
+
+    fileStream.writeStartElement("Media");
+    fileStream.writeTextElement("Images", mediaSources->imageDirectory);
+    fileStream.writeEndElement();
+
+    fileStream.writeStartElement("Input");
+    fileStream.writeTextElement("Universe", QString::number(sacnServer->universe));
     fileStream.writeEndElement();
 
     fileStream.writeEndElement();
