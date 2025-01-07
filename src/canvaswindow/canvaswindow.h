@@ -11,7 +11,7 @@
 
 #include <QtWidgets>
 
-#include "objectlist/objectlist.h"
+#include "objects/objectlist.h"
 #include "server/sacnserver.h"
 
 class CanvasWindow : public QWidget {

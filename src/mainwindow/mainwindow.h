@@ -14,7 +14,7 @@
 
 #include "canvaswindow/canvaswindow.h"
 #include "aboutwindow/aboutwindow.h"
-#include "objectlist/objectlist.h"
+#include "objects/objectlist.h"
 #include "server/sacnserver.h"
 
 class MainWindow : public QMainWindow

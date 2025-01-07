@@ -21,14 +21,14 @@ SOURCES += \
     canvaswindow/canvaswindow.cpp \
     main.cpp \
     mainwindow/mainwindow.cpp \
-    objectlist/objectlist.cpp \
+    objects/objectlist.cpp \
     server/sacnserver.cpp
 
 HEADERS += \
     aboutwindow/aboutwindow.h \
     canvaswindow/canvaswindow.h \
     mainwindow/mainwindow.h \
-    objectlist/objectlist.h \
+    objects/objectlist.h \
     server/sacnserver.h
 
 # Default rules for deployment.
