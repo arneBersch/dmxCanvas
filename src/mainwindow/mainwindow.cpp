@@ -81,20 +81,19 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(new QShortcut(QKeySequence(Qt::Key_F5), this), &QShortcut::activated, this, &MainWindow::openFullscreen); // Open Canvas Fullscreen
     connect(new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F5), this), &QShortcut::activated, this, &MainWindow::openWindow); // Open Canvas Window
 
-    QVBoxLayout* layout = new QVBoxLayout();
-    QWidget *centralWidget = new QWidget();
-    centralWidget->setLayout(layout);
-    this->setCentralWidget(centralWidget);
-
-    sacnServer = new SacnServer();
-    layout->addWidget(sacnServer);
+    QTabWidget *tabs = new QTabWidget();
+    tabs->setTabPosition(QTabWidget::South);
+    this->setCentralWidget(tabs);
 
     objectTable = new QTableView();
     objectList = new ObjectList(sacnServer, VERSION);
     objectTable->setModel(objectList);
     objectTable->horizontalHeader()->setStretchLastSection(true);
     objectTable->verticalHeader()->hide();
-    layout->addWidget(objectTable);
+    tabs->addTab(objectTable, "Objects");
+
+    sacnServer = new SacnServer();
+    tabs->addTab(sacnServer, "Input");
 
     this->show(); // Show window
     about(); // Open about window
