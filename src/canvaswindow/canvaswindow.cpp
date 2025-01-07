@@ -34,7 +34,7 @@ void CanvasWindow::paintEvent(QPaintEvent *event) {
     painter.setPen(Qt::NoPen);
     painter.setCompositionMode(QPainter::CompositionMode_Plus);
     for (int objectRow = 0; objectRow < objects->rowCount(); objectRow++) {
-        int address = objects->data(objects->index(objectRow, ObjectListColumns::ChannelColumn), Qt::DisplayRole).toInt();
+        int address = objects->data(objects->index(objectRow, ObjectListColumns::AddressColumn), Qt::DisplayRole).toInt();
         int x = sacn->dmxData[address - 1] * width() / 255;;
         int y = sacn->dmxData[address] * height() / 255;
         int size = sacn->dmxData[address + 1] * height() / 255;

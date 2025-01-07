@@ -8,117 +8,7 @@
 
 #include "objectlist.h"
 
-ObjectList::ObjectList(SacnServer *sacn, QString softwareVersion) {
-    sacnServer = sacn;
-    version = softwareVersion;
-    objects = QList<Object*>();
-}
-
-void ObjectList::newFile() {
-    removeRows(0, rowCount(), QModelIndex());
-    qDebug() << "Opened new file.";
-}
-
-void ObjectList::openFile(QString filename) {
-    QFile file(filename);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox errorBox;
-        errorBox.setText("Can't open file.");
-        errorBox.exec();
-        return;
-    }
-    QXmlStreamReader fileStream(&file);
-    if ((fileStream.readNextStartElement()) && (fileStream.name().toString() == "Workspace")) {
-        while (fileStream.readNextStartElement()) {
-            if (fileStream.name().toString() == "Creator") {
-                while (fileStream.readNextStartElement()) {
-                    if ((fileStream.name().toString() == "Name") && (fileStream.readElementText() != "dmxCanvas")) {
-                        QMessageBox errorBox;
-                        errorBox.setText("This is not a dmxCanvas file.");
-                        errorBox.exec();
-                        return;
-                    } else if ((fileStream.name().toString() == "Version") && (fileStream.readElementText() != version)) {
-                        QMessageBox errorBox;
-                        errorBox.setText("This dmxCanvas version isn't compatible to the current version (" + version + ").");
-                        errorBox.exec();
-                        return;
-                    }
-                }
-            } else if (fileStream.name().toString() == "Input") {
-                while (fileStream.readNextStartElement()) {
-                    if (fileStream.name().toString() == "Universe") {
-                        bool ok = true;
-                        int universe = fileStream.readElementText().toInt(&ok);
-                        if (!ok) {
-                            QMessageBox errorBox;
-                            errorBox.setText("Invalid Input Universe.");
-                            errorBox.exec();
-                            return;
-                        }
-                        sacnServer->setUniverse(universe);
-                    }
-                }
-            } else if (fileStream.name().toString() == "Objects") {
-                newFile();
-                while (fileStream.readNextStartElement()) {
-                    if (fileStream.name().toString() == "Object") {
-                        insertRows(rowCount(), 1);
-                        while (fileStream.readNextStartElement()) {
-                            if (fileStream.name().toString() == "Name") {
-                                setData(index((rowCount() - 1), ObjectListColumns::NameColumn), fileStream.readElementText());
-                            } else if (fileStream.name().toString() == "Channel") {
-                                setData(index((rowCount() - 1), ObjectListColumns::ChannelColumn), fileStream.readElementText());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    if (fileStream.hasError()) {
-        QMessageBox errorBox;
-        errorBox.setText("Can't open file because a XML passing error occured in line " + QString::number(fileStream.lineNumber()) + ": " + fileStream.errorString() + " (" + QString::number(fileStream.error()) + ")");
-        errorBox.exec();
-        return;
-    }
-    qDebug() << "Opened file " << filename;
-}
-
-void ObjectList::saveFile(QString filename) {
-    QFile file(filename);
-    if (!file.open(QIODevice::WriteOnly)) {
-        QMessageBox errorBox;
-        errorBox.setText("Unable to save file.");
-        errorBox.exec();
-        return;
-    }
-    QXmlStreamWriter fileStream(&file);
-    fileStream.setAutoFormatting(true);
-    fileStream.writeStartDocument();
-    fileStream.writeStartElement("Workspace");
-
-    fileStream.writeStartElement("Creator");
-    fileStream.writeTextElement("Name", "dmxCanvas");
-    fileStream.writeTextElement("Version", version);
-    fileStream.writeEndElement();
-
-    fileStream.writeStartElement("Input");
-    fileStream.writeTextElement("Universe", QString::number(sacnServer->universe));
-    fileStream.writeEndElement();
-
-    fileStream.writeStartElement("Objects");
-    for (Object* object : objects) {
-        fileStream.writeStartElement("Object");
-        fileStream.writeTextElement("Name", object->name);
-        fileStream.writeTextElement("Channel", QString::number(object->channel));
-        fileStream.writeEndElement();
-    }
-    fileStream.writeEndElement();
-
-    fileStream.writeEndElement();
-    fileStream.writeEndDocument();
-    qDebug() << "Saved file" << filename;
-}
+ObjectList::ObjectList() {}
 
 int ObjectList::rowCount(const QModelIndex &parent) const {
     Q_UNUSED(parent);
@@ -142,7 +32,7 @@ QVariant ObjectList::data(const QModelIndex &index, const int role) const {
     Object* object = objects[row];
     if (column == ObjectListColumns::NameColumn) {
         return object->name;
-    } else if (column == ObjectListColumns::ChannelColumn) {
+    } else if (column == ObjectListColumns::AddressColumn) {
         return (QString::number(object->channel));
     }
     return QVariant();
@@ -155,7 +45,7 @@ bool ObjectList::setData(const QModelIndex &index, const QVariant &value, int ro
         Object* object = objects[row];
         if (column == ObjectListColumns::NameColumn) {
             object->name = value.toString();
-        } else if (column == ObjectListColumns::ChannelColumn) {
+        } else if (column == ObjectListColumns::AddressColumn) {
             bool ok = false;
             int channel = value.toString().toInt(&ok);
             if (!ok || channel < 1 || channel > 506) {
@@ -176,8 +66,8 @@ QVariant ObjectList::headerData(int section, Qt::Orientation orientation, int ro
     if (orientation == Qt::Orientation::Horizontal) {
         if (section == ObjectListColumns::NameColumn) {
             return "Name";
-        } else if (section == ObjectListColumns::ChannelColumn) {
-            return "Channel";
+        } else if (section == ObjectListColumns::AddressColumn) {
+            return "Address";
         }
         return QVariant();
     }

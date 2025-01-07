@@ -86,7 +86,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     this->setCentralWidget(tabs);
 
     objectTable = new QTableView();
-    objectList = new ObjectList(sacnServer, VERSION);
+    objectList = new ObjectList();
     objectTable->setModel(objectList);
     objectTable->horizontalHeader()->setStretchLastSection(true);
     objectTable->verticalHeader()->hide();
@@ -143,8 +143,69 @@ void MainWindow::openFile() {
     if (newFileName.isEmpty()) {
         return;
     }
+    QFile file(newFileName);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox errorBox;
+        errorBox.setText("Can't open file.");
+        errorBox.exec();
+        return;
+    }
+    QXmlStreamReader fileStream(&file);
+    if ((fileStream.readNextStartElement()) && (fileStream.name().toString() == "Workspace")) {
+        while (fileStream.readNextStartElement()) {
+            if (fileStream.name().toString() == "Creator") {
+                while (fileStream.readNextStartElement()) {
+                    if ((fileStream.name().toString() == "Name") && (fileStream.readElementText() != "dmxCanvas")) {
+                        QMessageBox errorBox;
+                        errorBox.setText("This is not a dmxCanvas file.");
+                        errorBox.exec();
+                        return;
+                    } else if ((fileStream.name().toString() == "Version") && (fileStream.readElementText() != VERSION)) {
+                        QMessageBox errorBox;
+                        errorBox.setText("This dmxCanvas version isn't compatible to the current version (" + VERSION + ").");
+                        errorBox.exec();
+                        return;
+                    }
+                }
+            } else if (fileStream.name().toString() == "Input") {
+                while (fileStream.readNextStartElement()) {
+                    if (fileStream.name().toString() == "Universe") {
+                        bool ok = true;
+                        int universe = fileStream.readElementText().toInt(&ok);
+                        if (!ok) {
+                            QMessageBox errorBox;
+                            errorBox.setText("Invalid Input Universe.");
+                            errorBox.exec();
+                            return;
+                        }
+                        sacnServer->setUniverse(universe);
+                    }
+                }
+            } else if (fileStream.name().toString() == "Objects") {
+                newFile();
+                while (fileStream.readNextStartElement()) {
+                    if (fileStream.name().toString() == "Object") {
+                        objectList->insertRows(objectList->rowCount(), 1);
+                        while (fileStream.readNextStartElement()) {
+                            if (fileStream.name().toString() == "Name") {
+                                objectList->setData(objectList->index((objectList->rowCount() - 1), ObjectListColumns::NameColumn), fileStream.readElementText());
+                            } else if (fileStream.name().toString() == "Address") {
+                                objectList->setData(objectList->index((objectList->rowCount() - 1), ObjectListColumns::AddressColumn), fileStream.readElementText());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
     filename = newFileName;
-    objectList->openFile(filename);
+    if (fileStream.hasError()) {
+        QMessageBox errorBox;
+        errorBox.setText("Can't open file because a XML passing error occured in line " + QString::number(fileStream.lineNumber()) + ": " + fileStream.errorString() + " (" + QString::number(fileStream.error()) + ")");
+        errorBox.exec();
+        return;
+    }
+    qDebug() << "Opened file " << filename;
 }
 
 void MainWindow::newFile() {
@@ -155,7 +216,8 @@ void MainWindow::newFile() {
     if (messageBox.exec() != QMessageBox::Ok) {
         return;
     }
-    objectList->newFile();
+    objectList->removeRows(0, objectList->rowCount(), QModelIndex());
+    qDebug() << "Opened new file.";
 }
 
 void MainWindow::saveFile() {
@@ -169,7 +231,39 @@ void MainWindow::saveFile() {
             filename += ".dmxc";
         }
     }
-    objectList->saveFile(filename);
+    QFile file(filename);
+    if (!file.open(QIODevice::WriteOnly)) {
+        QMessageBox errorBox;
+        errorBox.setText("Unable to save file.");
+        errorBox.exec();
+        return;
+    }
+    QXmlStreamWriter fileStream(&file);
+    fileStream.setAutoFormatting(true);
+    fileStream.writeStartDocument();
+    fileStream.writeStartElement("Workspace");
+
+    fileStream.writeStartElement("Creator");
+    fileStream.writeTextElement("Name", "dmxCanvas");
+    fileStream.writeTextElement("Version", VERSION);
+    fileStream.writeEndElement();
+
+    fileStream.writeStartElement("Input");
+    fileStream.writeTextElement("Universe", QString::number(sacnServer->universe));
+    fileStream.writeEndElement();
+
+    fileStream.writeStartElement("Objects");
+    for (int objectRow = 0; objectRow < objectList->rowCount(); objectRow++) {
+        fileStream.writeStartElement("Object");
+        fileStream.writeTextElement("Name", objectList->data(objectList->index(objectRow, ObjectListColumns::NameColumn), Qt::DisplayRole).toString());
+        fileStream.writeTextElement("Address", objectList->data(objectList->index(objectRow, ObjectListColumns::AddressColumn), Qt::DisplayRole).toString());
+        fileStream.writeEndElement();
+    }
+    fileStream.writeEndElement();
+
+    fileStream.writeEndElement();
+    fileStream.writeEndDocument();
+    qDebug() << "Saved file" << filename;
 }
 
 void MainWindow::saveFileAs() {

@@ -11,8 +11,6 @@
 
 #include <QtWidgets>
 
-#include "server/sacnserver.h"
-
 struct Object {
     QString name = QString();
     int channel = 1;
@@ -21,16 +19,13 @@ struct Object {
 namespace ObjectListColumns {
 enum {
     NameColumn,
-    ChannelColumn,
+    AddressColumn,
 };
 }
 
 class ObjectList : public QAbstractTableModel {
 public:
-    ObjectList(SacnServer *sacn, QString softwareVersion);
-    void newFile();
-    void openFile(QString filename);
-    void saveFile(QString filename);
+    ObjectList();
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, const int role) const override;
@@ -40,9 +35,7 @@ public:
     bool insertRows(int position, int rows, const QModelIndex &index = QModelIndex()) override;
     bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex()) override;
 private:
-    QList<Object*> objects;
-    QString version;
-    SacnServer* sacnServer;
+    QList<Object*> objects = QList<Object*>();;
 };
 
 #endif // OBJECTLIST_H
