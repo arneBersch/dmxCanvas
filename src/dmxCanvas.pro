@@ -21,6 +21,7 @@ SOURCES += \
     canvaswindow/canvaswindow.cpp \
     main.cpp \
     mainwindow/mainwindow.cpp \
+    media/mediasources.cpp \
     objects/objectlist.cpp \
     server/sacnserver.cpp
 
@@ -28,6 +29,7 @@ HEADERS += \
     aboutwindow/aboutwindow.h \
     canvaswindow/canvaswindow.h \
     mainwindow/mainwindow.h \
+    media/mediasources.h \
     objects/objectlist.h \
     server/sacnserver.h
 

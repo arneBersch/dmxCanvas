@@ -92,6 +92,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     objectTable->verticalHeader()->hide();
     tabs->addTab(objectTable, "Objects");
 
+    mediaSources = new MediaSources();
+    tabs->addTab(mediaSources, "Media");
+
     sacnServer = new SacnServer();
     tabs->addTab(sacnServer, "Input");
 

@@ -15,6 +15,7 @@
 #include "canvaswindow/canvaswindow.h"
 #include "aboutwindow/aboutwindow.h"
 #include "objects/objectlist.h"
+#include "media/mediasources.h"
 #include "server/sacnserver.h"
 
 class MainWindow : public QMainWindow
@@ -35,6 +36,7 @@ private:
     void closeEvent(QCloseEvent *event) override;
     void about();
     ObjectList *objectList;
+    MediaSources *mediaSources;
     SacnServer *sacnServer;
     QTableView *objectTable;
     QString filename;
