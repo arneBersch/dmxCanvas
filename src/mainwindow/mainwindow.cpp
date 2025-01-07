@@ -220,6 +220,7 @@ void MainWindow::newFile() {
         return;
     }
     objectList->removeRows(0, objectList->rowCount(), QModelIndex());
+    sacnServer->setUniverse(1);
     qDebug() << "Opened new file.";
 }
 
