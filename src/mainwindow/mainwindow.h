@@ -41,6 +41,6 @@ private:
     QTableView *objectTable;
     QString filename;
     const QString VERSION = "0.1.0";
-    const QString COPYRIGHT = "Copyright (c) 2024 Arne Bersch (zoeglfrex-dmx@web.de)";
+    const QString COPYRIGHT = "Copyright (c) 2025 Arne Bersch (zoeglfrex-dmx@web.de)";
 };
 #endif // MAINWINDOW_H

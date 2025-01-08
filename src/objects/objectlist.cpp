@@ -17,7 +17,7 @@ int ObjectList::rowCount(const QModelIndex &parent) const {
 
 int ObjectList::columnCount(const QModelIndex &parent) const {
     Q_UNUSED(parent);
-    return 2;
+    return 3;
 }
 
 QVariant ObjectList::data(const QModelIndex &index, const int role) const {
@@ -33,7 +33,13 @@ QVariant ObjectList::data(const QModelIndex &index, const int role) const {
     if (column == ObjectListColumns::NameColumn) {
         return object->name;
     } else if (column == ObjectListColumns::AddressColumn) {
-        return (QString::number(object->channel));
+        return (QString::number(object->address));
+    } else if (column == ObjectListColumns::TypeColumn) {
+        if (object->type == ObjectTypes::VirtualBeam) {
+            return "Virtual Beam";
+        } else if (object->type == ObjectTypes::Image) {
+            return "Image";
+        }
     }
     return QVariant();
 }
@@ -47,11 +53,11 @@ bool ObjectList::setData(const QModelIndex &index, const QVariant &value, int ro
             object->name = value.toString();
         } else if (column == ObjectListColumns::AddressColumn) {
             bool ok = false;
-            int channel = value.toString().toInt(&ok);
-            if (!ok || channel < 1 || channel > 506) {
+            int address = value.toString().toInt(&ok);
+            if (!ok || address < 1 || address > 506) {
                 return false;
             }
-            object->channel = channel;
+            object->address = address;
         }
         emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
         return true;
@@ -68,6 +74,8 @@ QVariant ObjectList::headerData(int section, Qt::Orientation orientation, int ro
             return "Name";
         } else if (section == ObjectListColumns::AddressColumn) {
             return "Address";
+        } else if (section == ObjectListColumns::TypeColumn) {
+            return "Type";
         }
         return QVariant();
     }

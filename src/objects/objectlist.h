@@ -11,15 +11,24 @@
 
 #include <QtWidgets>
 
+namespace ObjectTypes {
+enum ObjectType {
+    VirtualBeam,
+    Image,
+};
+}
+
 struct Object {
     QString name = QString();
-    int channel = 1;
+    int address = 1;
+    ObjectTypes::ObjectType type = ObjectTypes::VirtualBeam;
 };
 
 namespace ObjectListColumns {
 enum {
     NameColumn,
     AddressColumn,
+    TypeColumn,
 };
 }
 
