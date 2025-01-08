@@ -15,6 +15,7 @@
 #include "canvaswindow/canvaswindow.h"
 #include "aboutwindow/aboutwindow.h"
 #include "objects/objectlist.h"
+#include "objects/objecttypeitemdelegate.h"
 #include "media/mediasources.h"
 #include "server/sacnserver.h"
 

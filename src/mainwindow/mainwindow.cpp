@@ -90,6 +90,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     objectTable->setModel(objectList);
     objectTable->horizontalHeader()->setStretchLastSection(true);
     objectTable->verticalHeader()->hide();
+    objectTable->setItemDelegateForColumn(ObjectListColumns::TypeColumn, new ObjectTypeItemDelegate(objectTable));
     tabs->addTab(objectTable, "Objects");
 
     mediaSources = new MediaSources();

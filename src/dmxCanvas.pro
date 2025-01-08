@@ -23,6 +23,7 @@ SOURCES += \
     mainwindow/mainwindow.cpp \
     media/mediasources.cpp \
     objects/objectlist.cpp \
+    objects/objecttypeitemdelegate.cpp \
     server/sacnserver.cpp
 
 HEADERS += \
@@ -31,6 +32,7 @@ HEADERS += \
     mainwindow/mainwindow.h \
     media/mediasources.h \
     objects/objectlist.h \
+    objects/objecttypeitemdelegate.h \
     server/sacnserver.h
 
 # Default rules for deployment.

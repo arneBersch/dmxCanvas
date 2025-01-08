@@ -53,11 +53,17 @@ bool ObjectList::setData(const QModelIndex &index, const QVariant &value, int ro
             object->name = value.toString();
         } else if (column == ObjectListColumns::AddressColumn) {
             bool ok = false;
-            int address = value.toString().toInt(&ok);
+            int address = value.toInt(&ok);
             if (!ok || address < 1 || address > 506) {
                 return false;
             }
             object->address = address;
+        } else if (column == ObjectListColumns::TypeColumn) {
+            if (value.toString() == "Virtual Beam") {
+                object->type = ObjectTypes::VirtualBeam;
+            } else if (value.toString() == "Image") {
+                object->type = ObjectTypes::Image;
+            }
         }
         emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
         return true;
