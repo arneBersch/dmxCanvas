@@ -6,19 +6,19 @@ It currently only runs on Linux (via AppImage), however Windows support is plann
 See the [Releases page](https://github.com/arneBersch/dmxCanvas/releases/) to download the latest version.
 
 ## Features
-- unlimited Virtual Beams with Pan, Tilt, Zoom and CMY Color Mixing
-- sACN (ANSI E1.31 input)
-- patch any Object to any DMX address
+* unlimited Virtual Beam Objects with Pan, Tilt, Zoom and CMY Color Mixing
+* unlimited Image Objects with X, Y, Zoom and Keystone correction
+* sACN (ANSI E1.31 input)
+* patch any Object to any DMX address
 
 ## Planned Features
-- other Virtual Beam features (like gobo, frost, prism, shutter, framing)
-- ArtNet input
-- Image viewer Objects
-- Video player Objects
-- Audio player Objects
+* other Virtual Beam features (like gobo, frost, prism, shutter, framing)
+* ArtNet input
+* Video player Objects
+* Audio player Objects
 
 ## Known Limitations
-- Some sACN features (unicast, priority, synchronization, universe discovery) are not implemented yet and will therefore not work
+* Some sACN features (unicast, priority, synchronization, universe discovery) are not implemented yet and will therefore not work
 
 ## How to contribute
 Please DO NOT post feature requests.
