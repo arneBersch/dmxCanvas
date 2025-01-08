@@ -135,11 +135,11 @@ void MainWindow::removeObject() {
 }
 
 void MainWindow::openWindow() {
-    new CanvasWindow(this, false, objectList, sacnServer);
+    new CanvasWindow(this, false, objectList, mediaSources, sacnServer);
 }
 
 void MainWindow::openFullscreen() {
-    new CanvasWindow(this, true, objectList, sacnServer);
+    new CanvasWindow(this, true, objectList, mediaSources, sacnServer);
 }
 
 void MainWindow::openFile() {

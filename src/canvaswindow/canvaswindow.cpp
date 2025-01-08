@@ -8,8 +8,9 @@
 
 #include "canvaswindow.h"
 
-CanvasWindow::CanvasWindow(QWidget *parent, bool fullscreen, ObjectList *objectList, SacnServer *sacnServer) : QWidget(parent, Qt::Window) {
+CanvasWindow::CanvasWindow(QWidget *parent, bool fullscreen, ObjectList *objectList, MediaSources *mediaSources, SacnServer *sacnServer) : QWidget(parent, Qt::Window) {
     objects = objectList;
+    media = mediaSources;
     sacn = sacnServer;
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("dmxCanvas");
@@ -35,16 +36,46 @@ void CanvasWindow::paintEvent(QPaintEvent *event) {
     painter.setCompositionMode(QPainter::CompositionMode_Plus);
     for (int objectRow = 0; objectRow < objects->rowCount(); objectRow++) {
         int address = objects->data(objects->index(objectRow, ObjectListColumns::AddressColumn), Qt::DisplayRole).toInt();
-        int x = sacn->dmxData[address - 1] * width() / 255;;
-        int y = sacn->dmxData[address] * height() / 255;
-        int size = sacn->dmxData[address + 1] * height() / 255;
-        int alpha = sacn->dmxData[address + 2];
-        int red = 255 - sacn->dmxData[address + 3];
-        int green = 255 - sacn->dmxData[address + 4];
-        int blue = 255 - sacn->dmxData[address + 5];
-        QBrush brush(Qt::SolidPattern);
-        brush.setColor(QColor(red, green, blue, alpha));
-        painter.setBrush(brush);
-        painter.drawEllipse((x - (size / 2)), (y - (size / 2)), size, size);
+        QString objectType = objects->data(objects->index(objectRow, ObjectListColumns::TypeColumn), Qt::DisplayRole).toString();
+        if (objectType == "Virtual Beam") {
+            int x = sacn->dmxData[address - 1] * width() / 255;;
+            int y = sacn->dmxData[address] * height() / 255;
+            int size = sacn->dmxData[address + 1] * height() / 255;
+            int alpha = sacn->dmxData[address + 2];
+            int red = 255 - sacn->dmxData[address + 3];
+            int green = 255 - sacn->dmxData[address + 4];
+            int blue = 255 - sacn->dmxData[address + 5];
+            QBrush brush(Qt::SolidPattern);
+            brush.setColor(QColor(red, green, blue, alpha));
+            painter.setBrush(brush);
+            painter.drawEllipse((x - (size / 2)), (y - (size / 2)), size, size);
+        } else if (objectType == "Image") {
+            int x = sacn->dmxData[address - 1] * width() / 255;;
+            int y = sacn->dmxData[address] * height() / 255;
+            int size = sacn->dmxData[address + 1] * height() / 255;
+            int alpha = sacn->dmxData[address + 2];
+            int imageIndex = sacn->dmxData[address + 3];
+            int verticalKeystone = 255 - sacn->dmxData[address + 4];
+            int horizontalKeystone = 255 - sacn->dmxData[address + 5];
+            QString imagePath = QString();
+            QDir directory = QDir(media->imageDirectory);
+            if (directory.exists()) {
+                QStringList images = directory.entryList(QDir::Files);
+                foreach(QString fileName, images) {
+                    bool isNumber = true;
+                    int number = fileName.split(".")[0].toInt(&isNumber);
+                    if (isNumber && (number == imageIndex)) {
+                        imagePath = directory.absoluteFilePath(fileName);
+                    }
+                }
+            }
+            if (!imagePath.isEmpty()) {
+                QImage image(imagePath);
+                if (!image.isNull()) {
+                    QRect target(0, 0, image.width(), image.height());
+                    painter.drawImage(target, image);
+                }
+            }
+        }
     }
 }

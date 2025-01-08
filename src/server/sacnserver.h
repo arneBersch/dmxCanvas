@@ -16,7 +16,7 @@ class SacnServer : public QWidget {
     Q_OBJECT
 public:
     SacnServer();
-    uint8_t dmxData[512];
+    uint8_t dmxData[512] = {0};
     int universe = 1;
 public slots:
     void setUniverse(int newUniverse = -1);
