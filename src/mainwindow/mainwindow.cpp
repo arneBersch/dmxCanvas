@@ -181,6 +181,8 @@ void MainWindow::openFile() {
                                 objectList->setData(objectList->index((objectList->rowCount() - 1), ObjectListColumns::NameColumn), fileStream.readElementText());
                             } else if (fileStream.name().toString() == "Address") {
                                 objectList->setData(objectList->index((objectList->rowCount() - 1), ObjectListColumns::AddressColumn), fileStream.readElementText());
+                            } else if (fileStream.name().toString() == "Type") {
+                                objectList->setData(objectList->index((objectList->rowCount() - 1), ObjectListColumns::TypeColumn), fileStream.readElementText());
                             }
                         }
                     }
@@ -265,6 +267,7 @@ void MainWindow::saveFile() {
         fileStream.writeStartElement("Object");
         fileStream.writeTextElement("Name", objectList->data(objectList->index(objectRow, ObjectListColumns::NameColumn), Qt::DisplayRole).toString());
         fileStream.writeTextElement("Address", objectList->data(objectList->index(objectRow, ObjectListColumns::AddressColumn), Qt::DisplayRole).toString());
+        fileStream.writeTextElement("Type", objectList->data(objectList->index(objectRow, ObjectListColumns::TypeColumn), Qt::DisplayRole).toString());
         fileStream.writeEndElement();
     }
     fileStream.writeEndElement();
