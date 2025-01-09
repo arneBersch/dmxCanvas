@@ -26,10 +26,9 @@ private:
     const int SACN_PORT = 5568;
     const int SACN_MIN_UNIVERSE = 1;
     const int SACN_MAX_UNIVERSE = 63999;
-    QUdpSocket *socket;
+    QUdpSocket *socket = new QUdpSocket();
     QLabel *packetsCounterLabel;
     unsigned long receivedPackets = 0;
-    QHostAddress universeToHostAddress(int universe);
 };
 
 #endif // SACNSERVER_H

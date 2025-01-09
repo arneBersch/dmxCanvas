@@ -24,12 +24,7 @@ SacnServer::SacnServer() {
     packetsCounterLabel = new QLabel(QString::number(receivedPackets));
     layout->addWidget(packetsCounterLabel, 2, 1);
 
-    socket = new QUdpSocket();
-    socket->bind(QHostAddress::AnyIPv4, SACN_PORT);
-    //socket->setSocketOption(QAbstractSocket::MulticastLoopbackOption, false);
-    socket->joinMulticastGroup(universeToHostAddress(universe));
     setUniverse(universe);
-    connect(socket, &QUdpSocket::readyRead, this, &SacnServer::processPendingDatagrams);
 }
 
 
@@ -99,16 +94,17 @@ void SacnServer::processPendingDatagrams() {
 }
 
 void SacnServer::setUniverse(int newUniverse) {
-    socket->leaveMulticastGroup(universeToHostAddress(universe));
     universe = newUniverse;
-    socket->joinMulticastGroup(universeToHostAddress(universe));
-    qDebug() << "Set sACN Universe to " << universe << " and Multicast address to " << universeToHostAddress(universe).toString() << ".";
-}
-
-QHostAddress SacnServer::universeToHostAddress(int universeId) {
     QString address = "239.255.";
-    address += QString::number(universeId / 256);
+    address += QString::number(universe / 256);
     address += ".";
-    address += QString::number(universeId % 256);
-    return QHostAddress(address);
+    address += QString::number(universe % 256);
+    delete socket;
+    socket = new QUdpSocket();
+    socket->bind(QHostAddress::AnyIPv4, SACN_PORT);
+    for (QNetworkInterface interface : QNetworkInterface::allInterfaces()) {
+        socket->joinMulticastGroup(QHostAddress(address), interface);
+    }
+    connect(socket, &QUdpSocket::readyRead, this, &SacnServer::processPendingDatagrams);
+    qDebug() << "Set sACN Universe to " << universe << " and Multicast address to " << address << ".";
 }
