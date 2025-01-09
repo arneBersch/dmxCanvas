@@ -204,7 +204,7 @@ void MainWindow::openFile() {
                             errorBox.exec();
                             return;
                         }
-                        sacnServer->setUniverse(universe);
+                        sacnServer->universeSpinBox->setValue(universe);
                     }
                 }
             }
@@ -230,7 +230,7 @@ void MainWindow::newFile() {
     }
     objectList->removeRows(0, objectList->rowCount(), QModelIndex());
     mediaSources->resetSources();
-    sacnServer->setUniverse(1);
+    sacnServer->universeSpinBox->setValue(sacnServer->SACN_MIN_UNIVERSE);
     qDebug() << "Opened new file.";
 }
 
@@ -277,7 +277,7 @@ void MainWindow::saveFile() {
     fileStream.writeEndElement();
 
     fileStream.writeStartElement("Input");
-    fileStream.writeTextElement("Universe", QString::number(sacnServer->universe));
+    fileStream.writeTextElement("Universe", QString::number(sacnServer->universeSpinBox->value()));
     fileStream.writeEndElement();
 
     fileStream.writeEndElement();

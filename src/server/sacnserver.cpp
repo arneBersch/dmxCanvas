@@ -24,7 +24,7 @@ SacnServer::SacnServer() {
     packetsCounterLabel = new QLabel(QString::number(receivedPackets));
     layout->addWidget(packetsCounterLabel, 2, 1);
 
-    setUniverse(universe);
+    setUniverse(SACN_MIN_UNIVERSE);
 }
 
 
@@ -65,7 +65,7 @@ void SacnServer::processPendingDatagrams() {
             && (data[42] == (char)0x00)
             && (data[43] == (char)0x02)
             // Universe
-            && (((256 * (uint8_t)data[113]) + (uint8_t)data[114]) == universe)
+            && (((256 * (uint8_t)data[113]) + (uint8_t)data[114]) == universeSpinBox->value())
             // DMP LAYER
             // Vector
             && (data[117] == (char)0x02)
@@ -93,11 +93,7 @@ void SacnServer::processPendingDatagrams() {
     }
 }
 
-void SacnServer::setUniverse(int newUniverse) {
-    universe = newUniverse;
-    if (universeSpinBox->value() != universe) {
-        universeSpinBox->setValue(universe);
-    }
+void SacnServer::setUniverse(int universe) {
     QString address = "239.255.";
     address += QString::number(universe / 256);
     address += ".";
