@@ -71,8 +71,9 @@ void CanvasWindow::paintEvent(QPaintEvent *event) {
             }
             if (!imagePath.isEmpty()) {
                 QImage image(imagePath);
+                int width = (image.width() * size / image.height());
                 if (!image.isNull()) {
-                    QRect target(0, 0, image.width(), image.height());
+                    QRect target((x - (size / 2)), (y - (size / 2)), width, size);
                     painter.drawImage(target, image);
                 }
             }
