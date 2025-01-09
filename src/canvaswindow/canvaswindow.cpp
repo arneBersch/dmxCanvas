@@ -71,9 +71,19 @@ void CanvasWindow::paintEvent(QPaintEvent *event) {
             }
             if (!imagePath.isEmpty()) {
                 QImage image(imagePath);
+                QImage mask(image);
+                QPainter imagePainter(&mask);
+                imagePainter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+                imagePainter.fillRect(mask.rect(), QColor(alpha, alpha, alpha));
+                imagePainter.end();
+
+                imagePainter.begin(&image);
+                imagePainter.setCompositionMode(QPainter::CompositionMode_Darken);
+                imagePainter.drawImage(0, 0, mask);
+                imagePainter.end();
                 int width = (image.width() * size / image.height());
                 if (!image.isNull()) {
-                    QRect target((x - (size / 2)), (y - (size / 2)), width, size);
+                    QRect target((x - (width / 2)), (y - (size / 2)), width, size);
                     painter.drawImage(target, image);
                 }
             }
