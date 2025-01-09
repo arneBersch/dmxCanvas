@@ -38,7 +38,7 @@ void CanvasWindow::paintEvent(QPaintEvent *event) {
         int address = objects->data(objects->index(objectRow, ObjectListColumns::AddressColumn), Qt::DisplayRole).toInt();
         QString objectType = objects->data(objects->index(objectRow, ObjectListColumns::TypeColumn), Qt::DisplayRole).toString();
         if (objectType == "Virtual Beam") {
-            int x = sacn->dmxData[address - 1] * width() / 255;;
+            int x = sacn->dmxData[address - 1] * width() / 255;
             int y = sacn->dmxData[address] * height() / 255;
             int size = sacn->dmxData[address + 1] * height() / 255;
             int alpha = sacn->dmxData[address + 2];
@@ -50,7 +50,7 @@ void CanvasWindow::paintEvent(QPaintEvent *event) {
             painter.setBrush(brush);
             painter.drawEllipse((x - (size / 2)), (y - (size / 2)), size, size);
         } else if (objectType == "Image") {
-            int x = sacn->dmxData[address - 1] * width() / 255;;
+            int x = sacn->dmxData[address - 1] * width() / 255;
             int y = sacn->dmxData[address] * height() / 255;
             int size = sacn->dmxData[address + 1] * height() / 255;
             int alpha = sacn->dmxData[address + 2];

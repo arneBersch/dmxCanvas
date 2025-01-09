@@ -44,7 +44,7 @@ public:
     bool insertRows(int position, int rows, const QModelIndex &index = QModelIndex()) override;
     bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex()) override;
 private:
-    QList<Object*> objects = QList<Object*>();;
+    QList<Object*> objects = QList<Object*>();
 };
 
 #endif // OBJECTLIST_H
