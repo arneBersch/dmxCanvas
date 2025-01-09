@@ -14,7 +14,7 @@ SacnServer::SacnServer() {
 
     QLabel *universeLabel = new QLabel("sACN Universe");
     layout->addWidget(universeLabel, 0, 0);
-    QSpinBox *universeSpinBox = new QSpinBox();
+    universeSpinBox = new QSpinBox();
     universeSpinBox->setRange(SACN_MIN_UNIVERSE, SACN_MAX_UNIVERSE);
     connect(universeSpinBox, &QSpinBox::valueChanged, this, &SacnServer::setUniverse);
     layout->addWidget(universeSpinBox, 0, 1);
@@ -95,6 +95,9 @@ void SacnServer::processPendingDatagrams() {
 
 void SacnServer::setUniverse(int newUniverse) {
     universe = newUniverse;
+    if (universeSpinBox->value() != universe) {
+        universeSpinBox->setValue(universe);
+    }
     QString address = "239.255.";
     address += QString::number(universe / 256);
     address += ".";

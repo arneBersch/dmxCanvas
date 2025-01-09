@@ -27,6 +27,7 @@ private:
     const int SACN_MIN_UNIVERSE = 1;
     const int SACN_MAX_UNIVERSE = 63999;
     QUdpSocket *socket = new QUdpSocket();
+    QSpinBox *universeSpinBox;
     QLabel *packetsCounterLabel;
     unsigned long receivedPackets = 0;
 };
