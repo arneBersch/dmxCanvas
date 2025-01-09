@@ -9,18 +9,24 @@
 #include "sacnserver.h"
 
 SacnServer::SacnServer() {
-    QHBoxLayout* layout = new QHBoxLayout();
+    QGridLayout* layout = new QGridLayout();
     setLayout(layout);
 
-    counterLabel = new QLabel();
-    layout->addWidget(counterLabel);
+    QLabel *universeLabel = new QLabel("sACN Universe");
+    layout->addWidget(universeLabel, 0, 0);
+    QSpinBox *universeSpinBox = new QSpinBox();
+    universeSpinBox->setRange(SACN_MIN_UNIVERSE, SACN_MAX_UNIVERSE);
+    connect(universeSpinBox, &QSpinBox::valueChanged, this, &SacnServer::setUniverse);
+    layout->addWidget(universeSpinBox, 0, 1);
 
-    QPushButton *setUniverseButton = new QPushButton("Set sACN Universe");
-    connect(setUniverseButton, &QPushButton::clicked, this, &SacnServer::setUniverse);
-    layout->addWidget(setUniverseButton);
+    QLabel *receivedPacketsLabel = new QLabel("Received Packets");
+    layout->addWidget(receivedPacketsLabel, 2, 0);
+    packetsCounterLabel = new QLabel(QString::number(receivedPackets));
+    layout->addWidget(packetsCounterLabel, 2, 1);
 
     socket = new QUdpSocket();
-    socket->bind(QHostAddress::AnyIPv4, 5568);
+    socket->bind(QHostAddress::AnyIPv4, SACN_PORT);
+    //socket->setSocketOption(QAbstractSocket::MulticastLoopbackOption, false);
     socket->joinMulticastGroup(universeToHostAddress(universe));
     setUniverse(universe);
     connect(socket, &QUdpSocket::readyRead, this, &SacnServer::processPendingDatagrams);
@@ -85,7 +91,7 @@ void SacnServer::processPendingDatagrams() {
                     dmxData[channel] = 0;
                 }
             }
-            counterLabel->setText("Received Packets on Universe " + QString::number(universe) + ": " + QString::number(receivedPackets));
+            packetsCounterLabel->setText(QString::number(receivedPackets));
         } else {
             qDebug() << "Received invalid data.";
         }
@@ -93,19 +99,10 @@ void SacnServer::processPendingDatagrams() {
 }
 
 void SacnServer::setUniverse(int newUniverse) {
-    if (newUniverse < 1) {
-        bool ok = true;
-        newUniverse = QInputDialog::getInt(this, "Set sACN Universe", "Please insert the wanted sACN Universe. The Universe has to be between 1 and 63999.", universe, 1, 63999, 1, &ok);
-        if (!ok) {
-            return;
-        }
-    }
     socket->leaveMulticastGroup(universeToHostAddress(universe));
     universe = newUniverse;
     socket->joinMulticastGroup(universeToHostAddress(universe));
     qDebug() << "Set sACN Universe to " << universe << " and Multicast address to " << universeToHostAddress(universe).toString() << ".";
-    receivedPackets = 0;
-    counterLabel->setText("No packets were received in sACN universe " + QString::number(universe) + ".");
 }
 
 QHostAddress SacnServer::universeToHostAddress(int universeId) {
