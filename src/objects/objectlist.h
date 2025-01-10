@@ -11,24 +11,30 @@
 
 #include <QtWidgets>
 
+namespace ObjectTypes {
+enum ObjectType {
+    VirtualBeam,
+    Image,
+};
+}
+
 struct Object {
     QString name = QString();
-    int channel = 1;
+    int address = 1;
+    ObjectTypes::ObjectType type = ObjectTypes::VirtualBeam;
 };
 
 namespace ObjectListColumns {
 enum {
     NameColumn,
-    ChannelColumn,
+    AddressColumn,
+    TypeColumn,
 };
 }
 
 class ObjectList : public QAbstractTableModel {
 public:
-    ObjectList(QString softwareVersion);
-    void newFile();
-    void openFile(QString filename);
-    void saveFile(QString filename);
+    ObjectList();
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, const int role) const override;
@@ -38,8 +44,7 @@ public:
     bool insertRows(int position, int rows, const QModelIndex &index = QModelIndex()) override;
     bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex()) override;
 private:
-    QList<Object*> objects;
-    QString version;
+    QList<Object*> objects = QList<Object*>();
 };
 
 #endif // OBJECTLIST_H

@@ -21,14 +21,18 @@ SOURCES += \
     canvaswindow/canvaswindow.cpp \
     main.cpp \
     mainwindow/mainwindow.cpp \
-    objectlist/objectlist.cpp \
+    media/mediasources.cpp \
+    objects/objectlist.cpp \
+    objects/objecttypeitemdelegate.cpp \
     server/sacnserver.cpp
 
 HEADERS += \
     aboutwindow/aboutwindow.h \
     canvaswindow/canvaswindow.h \
     mainwindow/mainwindow.h \
-    objectlist/objectlist.h \
+    media/mediasources.h \
+    objects/objectlist.h \
+    objects/objecttypeitemdelegate.h \
     server/sacnserver.h
 
 # Default rules for deployment.

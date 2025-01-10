@@ -16,12 +16,17 @@ class SacnServer : public QWidget {
     Q_OBJECT
 public:
     SacnServer();
-    uint8_t dmxData[512];
+    uint8_t dmxData[512] = {0};
+    QSpinBox *universeSpinBox;
+    const int SACN_PORT = 5568;
+    const int SACN_MIN_UNIVERSE = 1;
+    const int SACN_MAX_UNIVERSE = 63999;
 private slots:
+    void setUniverse(int newUniverse);
     void processPendingDatagrams();
 private:
-    QUdpSocket *socket;
-    QLabel *counterLabel;
+    QUdpSocket *socket = new QUdpSocket();
+    QLabel *packetsCounterLabel;
     unsigned long receivedPackets = 0;
 };
 

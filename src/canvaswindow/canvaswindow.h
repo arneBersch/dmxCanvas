@@ -11,16 +11,18 @@
 
 #include <QtWidgets>
 
-#include "objectlist/objectlist.h"
+#include "objects/objectlist.h"
+#include "media/mediasources.h"
 #include "server/sacnserver.h"
 
 class CanvasWindow : public QWidget {
     Q_OBJECT
 public:
-    CanvasWindow(QWidget* parent, bool fullscreen, ObjectList* objectList, SacnServer* sacnServer);
+    CanvasWindow(QWidget* parent, bool fullscreen, ObjectList* objectList, MediaSources *mediaSources, SacnServer* sacnServer);
     void paintEvent(QPaintEvent *event) override;
 private:
     ObjectList *objects;
+    MediaSources *media;
     SacnServer *sacn;
 };
 

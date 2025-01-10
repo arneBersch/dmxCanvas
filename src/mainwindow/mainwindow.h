@@ -14,7 +14,9 @@
 
 #include "canvaswindow/canvaswindow.h"
 #include "aboutwindow/aboutwindow.h"
-#include "objectlist/objectlist.h"
+#include "objects/objectlist.h"
+#include "objects/objecttypeitemdelegate.h"
+#include "media/mediasources.h"
 #include "server/sacnserver.h"
 
 class MainWindow : public QMainWindow
@@ -32,13 +34,15 @@ private:
     void newFile();
     void saveFile();
     void saveFileAs();
+    void reset();
     void closeEvent(QCloseEvent *event) override;
     void about();
     ObjectList *objectList;
+    MediaSources *mediaSources;
     SacnServer *sacnServer;
     QTableView *objectTable;
     QString filename;
-    const QString VERSION = "0.0.0";
-    const QString COPYRIGHT = "Copyright (c) 2024 Arne Bersch (zoeglfrex-dmx@web.de)";
+    const QString VERSION = "0.1.0";
+    const QString COPYRIGHT = "Copyright (c) 2025 Arne Bersch (zoeglfrex-dmx@web.de)";
 };
 #endif // MAINWINDOW_H

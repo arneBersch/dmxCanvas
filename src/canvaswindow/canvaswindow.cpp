@@ -8,8 +8,9 @@
 
 #include "canvaswindow.h"
 
-CanvasWindow::CanvasWindow(QWidget *parent, bool fullscreen, ObjectList *objectList, SacnServer *sacnServer) : QWidget(parent, Qt::Window) {
+CanvasWindow::CanvasWindow(QWidget *parent, bool fullscreen, ObjectList *objectList, MediaSources *mediaSources, SacnServer *sacnServer) : QWidget(parent, Qt::Window) {
     objects = objectList;
+    media = mediaSources;
     sacn = sacnServer;
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("dmxCanvas");
@@ -34,17 +35,56 @@ void CanvasWindow::paintEvent(QPaintEvent *event) {
     painter.setPen(Qt::NoPen);
     painter.setCompositionMode(QPainter::CompositionMode_Plus);
     for (int objectRow = 0; objectRow < objects->rowCount(); objectRow++) {
-        int address = objects->data(objects->index(objectRow, ObjectListColumns::ChannelColumn), Qt::DisplayRole).toInt();
-        int x = sacn->dmxData[address - 1] * width() / 255;;
-        int y = sacn->dmxData[address] * height() / 255;
-        int size = sacn->dmxData[address + 1] * height() / 255;
-        int alpha = sacn->dmxData[address + 2];
-        int red = 255 - sacn->dmxData[address + 3];
-        int green = 255 - sacn->dmxData[address + 4];
-        int blue = 255 - sacn->dmxData[address + 5];
-        QBrush brush(Qt::SolidPattern);
-        brush.setColor(QColor(red, green, blue, alpha));
-        painter.setBrush(brush);
-        painter.drawEllipse((x - (size / 2)), (y - (size / 2)), size, size);
+        int address = objects->data(objects->index(objectRow, ObjectListColumns::AddressColumn), Qt::DisplayRole).toInt();
+        QString objectType = objects->data(objects->index(objectRow, ObjectListColumns::TypeColumn), Qt::DisplayRole).toString();
+        if (objectType == "Virtual Beam") {
+            int x = sacn->dmxData[address - 1] * width() / 255;
+            int y = sacn->dmxData[address] * height() / 255;
+            int size = sacn->dmxData[address + 1] * height() / 255;
+            int alpha = sacn->dmxData[address + 2];
+            int red = 255 - sacn->dmxData[address + 3];
+            int green = 255 - sacn->dmxData[address + 4];
+            int blue = 255 - sacn->dmxData[address + 5];
+            QBrush brush(Qt::SolidPattern);
+            brush.setColor(QColor(red, green, blue, alpha));
+            painter.setBrush(brush);
+            painter.drawEllipse((x - (size / 2)), (y - (size / 2)), size, size);
+        } else if (objectType == "Image") {
+            int x = sacn->dmxData[address - 1] * width() / 255;
+            int y = sacn->dmxData[address] * height() / 255;
+            int size = sacn->dmxData[address + 1] * height() / 255;
+            int alpha = sacn->dmxData[address + 2];
+            int imageIndex = sacn->dmxData[address + 3];
+            QString imagePath = QString();
+            QDir directory = QDir(media->imageDirectory);
+            if (directory.exists()) {
+                QStringList images = directory.entryList(QDir::Files);
+                foreach(QString fileName, images) {
+                    bool isNumber = true;
+                    int number = fileName.split(".")[0].toInt(&isNumber);
+                    if (isNumber && (number == imageIndex)) {
+                        imagePath = directory.absoluteFilePath(fileName);
+                    }
+                }
+            }
+            if (!imagePath.isEmpty()) {
+                QImage image(imagePath);
+                QImage mask(image);
+                QPainter imagePainter(&mask);
+                imagePainter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+                imagePainter.fillRect(mask.rect(), QColor(alpha, alpha, alpha));
+                imagePainter.end();
+
+                imagePainter.begin(&image);
+                imagePainter.setCompositionMode(QPainter::CompositionMode_Darken);
+                imagePainter.drawImage(0, 0, mask);
+                imagePainter.end();
+                int width = (image.width() * size / image.height());
+                if (!image.isNull()) {
+                    QRect target((x - (width / 2)), (y - (size / 2)), width, size);
+                    painter.drawImage(target, image);
+                }
+            }
+        }
     }
 }

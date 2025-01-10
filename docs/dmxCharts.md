@@ -1,9 +1,17 @@
 # DMX Charts for dmxCanvas
 
-- Channel 1: Pan
-- Channel 2: Tilt
-- Channel 3: Zoom
-- Channel 4: Intensity
-- Channel 5: Cyan
-- Channel 6: Magenta
-- Channel 7: Yellow
+## Virtual Beam
+* Channel 1: Pan
+* Channel 2: Tilt
+* Channel 3: Zoom
+* Channel 4: Intensity
+* Channel 5: Cyan
+* Channel 6: Magenta
+* Channel 7: Yellow
+
+## Image
+* Channel 1: X
+* Channel 2: Y
+* Channel 3: Zoom
+* Channel 4: Brightness
+* Channel 5: Image Index

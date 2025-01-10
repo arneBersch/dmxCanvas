@@ -9,16 +9,22 @@
 #include "sacnserver.h"
 
 SacnServer::SacnServer() {
-    QHBoxLayout* layout = new QHBoxLayout();
+    QGridLayout* layout = new QGridLayout();
     setLayout(layout);
 
-    counterLabel = new QLabel("No packets received.");
-    layout->addWidget(counterLabel);
+    QLabel *universeLabel = new QLabel("sACN Universe");
+    layout->addWidget(universeLabel, 0, 0);
+    universeSpinBox = new QSpinBox();
+    universeSpinBox->setRange(SACN_MIN_UNIVERSE, SACN_MAX_UNIVERSE);
+    connect(universeSpinBox, &QSpinBox::valueChanged, this, &SacnServer::setUniverse);
+    layout->addWidget(universeSpinBox, 0, 1);
 
-    socket = new QUdpSocket();
-    socket->bind(QHostAddress::AnyIPv4, 5568);
-    socket->joinMulticastGroup(QHostAddress("239.255.0.1"));
-    connect(socket, &QUdpSocket::readyRead, this, &SacnServer::processPendingDatagrams);
+    QLabel *receivedPacketsLabel = new QLabel("Received Packets");
+    layout->addWidget(receivedPacketsLabel, 2, 0);
+    packetsCounterLabel = new QLabel(QString::number(receivedPackets));
+    layout->addWidget(packetsCounterLabel, 2, 1);
+
+    setUniverse(SACN_MIN_UNIVERSE);
 }
 
 
@@ -59,7 +65,7 @@ void SacnServer::processPendingDatagrams() {
             && (data[42] == (char)0x00)
             && (data[43] == (char)0x02)
             // Universe
-            //&& (data.mid(113, 2).toInt(nullptr, 16) == 1)
+            && (((256 * (uint8_t)data[113]) + (uint8_t)data[114]) == universeSpinBox->value())
             // DMP LAYER
             // Vector
             && (data[117] == (char)0x02)
@@ -80,9 +86,24 @@ void SacnServer::processPendingDatagrams() {
                     dmxData[channel] = 0;
                 }
             }
+            packetsCounterLabel->setText(QString::number(receivedPackets));
         } else {
             qDebug() << "Received invalid data.";
         }
     }
-    counterLabel->setText("Received Packets: " + QString::number(receivedPackets));
+}
+
+void SacnServer::setUniverse(int universe) {
+    QString address = "239.255.";
+    address += QString::number(universe / 256);
+    address += ".";
+    address += QString::number(universe % 256);
+    delete socket;
+    socket = new QUdpSocket();
+    socket->bind(QHostAddress::AnyIPv4, SACN_PORT);
+    for (QNetworkInterface interface : QNetworkInterface::allInterfaces()) {
+        socket->joinMulticastGroup(QHostAddress(address), interface);
+    }
+    connect(socket, &QUdpSocket::readyRead, this, &SacnServer::processPendingDatagrams);
+    qDebug() << "Set sACN Universe to " << universe << " and Multicast address to " << address << ".";
 }
