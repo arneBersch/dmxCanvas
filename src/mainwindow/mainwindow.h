@@ -34,6 +34,7 @@ private:
     void newFile();
     void saveFile();
     void saveFileAs();
+    void reset();
     void closeEvent(QCloseEvent *event) override;
     void about();
     ObjectList *objectList;

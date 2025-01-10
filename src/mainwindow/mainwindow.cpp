@@ -154,6 +154,7 @@ void MainWindow::openFile() {
         errorBox.exec();
         return;
     }
+    reset();
     QXmlStreamReader fileStream(&file);
     if ((fileStream.readNextStartElement()) && (fileStream.name().toString() == "Workspace")) {
         while (fileStream.readNextStartElement()) {
@@ -172,7 +173,6 @@ void MainWindow::openFile() {
                     }
                 }
             } else if (fileStream.name().toString() == "Objects") {
-                newFile();
                 while (fileStream.readNextStartElement()) {
                     if (fileStream.name().toString() == "Object") {
                         objectList->insertRows(objectList->rowCount(), 1);
@@ -228,9 +228,7 @@ void MainWindow::newFile() {
     if (messageBox.exec() != QMessageBox::Ok) {
         return;
     }
-    objectList->removeRows(0, objectList->rowCount(), QModelIndex());
-    mediaSources->resetSources();
-    sacnServer->universeSpinBox->setValue(sacnServer->SACN_MIN_UNIVERSE);
+    reset();
     qDebug() << "Opened new file.";
 }
 
@@ -288,6 +286,12 @@ void MainWindow::saveFile() {
 void MainWindow::saveFileAs() {
     filename = QString(); // reset filename
     saveFile();
+}
+
+void MainWindow::reset() {
+    objectList->removeRows(0, objectList->rowCount(), QModelIndex());
+    mediaSources->resetSources();
+    sacnServer->universeSpinBox->setValue(sacnServer->SACN_MIN_UNIVERSE);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
