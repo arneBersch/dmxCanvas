@@ -54,12 +54,22 @@ bool ObjectList::setData(const QModelIndex &index, const QVariant &value, int ro
         } else if (column == ObjectListColumns::AddressColumn) {
             bool ok = false;
             int address = value.toInt(&ok);
-            if (!ok || address < 1 || address > 506) {
+            int channels = 0;
+            if (object->type == ObjectTypes::VirtualBeam) {
+                channels = 7;
+            } else if (object->type == ObjectTypes::Image) {
+                channels = 5;
+            }
+            if (!ok || address < 1 || address > (513 - channels)) {
                 return false;
             }
             object->address = address;
         } else if (column == ObjectListColumns::TypeColumn) {
             if (value.toString() == "Virtual Beam") {
+                if (object->address > 506) {
+                    object->address = 506;
+                    emit dataChanged(this->index(row, ObjectListColumns::AddressColumn), this->index(row, ObjectListColumns::AddressColumn), {Qt::DisplayRole, Qt::EditRole});
+                }
                 object->type = ObjectTypes::VirtualBeam;
             } else if (value.toString() == "Image") {
                 object->type = ObjectTypes::Image;

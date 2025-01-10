@@ -55,8 +55,6 @@ void CanvasWindow::paintEvent(QPaintEvent *event) {
             int size = sacn->dmxData[address + 1] * height() / 255;
             int alpha = sacn->dmxData[address + 2];
             int imageIndex = sacn->dmxData[address + 3];
-            int verticalKeystone = 255 - sacn->dmxData[address + 4];
-            int horizontalKeystone = 255 - sacn->dmxData[address + 5];
             QString imagePath = QString();
             QDir directory = QDir(media->imageDirectory);
             if (directory.exists()) {
