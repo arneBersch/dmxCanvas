@@ -42,16 +42,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     fileMenu->addAction(quitAction);
     connect(quitAction, &QAction::triggered, this, &MainWindow::close);
 
-    QMenu *objectMenu = menuBar()->addMenu("Objects");
-
-    QAction *addObjectAction = new QAction("Add");
-    objectMenu->addAction(addObjectAction);
-    connect(addObjectAction, &QAction::triggered, this, &MainWindow::addObject);
-
-    QAction *removeObjectAction = new QAction("Remove (Del)");
-    objectMenu->addAction(removeObjectAction);
-    connect(removeObjectAction, &QAction::triggered, this, &MainWindow::removeObject);
-
     QMenu *outputMenu = menuBar()->addMenu("Output");
 
     QAction *openFullscreenAction = new QAction("Open Canvas Fullscreen (F5)");
@@ -77,7 +67,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_S), this), &QShortcut::activated, this, &MainWindow::saveFile); // Save File
     connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_S), this), &QShortcut::activated, this, &MainWindow::saveFileAs); // Save File As
     connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Q), this), &QShortcut::activated, this, &MainWindow::close); // Quit Application
-    connect(new QShortcut(QKeySequence(Qt::Key_Delete), this), &QShortcut::activated, this, &MainWindow::removeObject); // Remove Object
     connect(new QShortcut(QKeySequence(Qt::Key_F5), this), &QShortcut::activated, this, &MainWindow::openFullscreen); // Open Canvas Fullscreen
     connect(new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F5), this), &QShortcut::activated, this, &MainWindow::openWindow); // Open Canvas Window
 
@@ -85,6 +74,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     tabs->setTabPosition(QTabWidget::South);
     this->setCentralWidget(tabs);
 
+    QVBoxLayout *objectsLayout = new QVBoxLayout();
+    QWidget *objects = new QWidget;
+    objects->setLayout(objectsLayout);
     objectTable = new QTableView();
     objectList = new ObjectList();
     objectTable->setModel(objectList);
@@ -92,7 +84,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     objectTable->verticalHeader()->hide();
     objectTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     objectTable->setItemDelegateForColumn(ObjectListColumns::TypeColumn, new ObjectTypeItemDelegate(objectTable));
-    tabs->addTab(objectTable, "Objects");
+    objectsLayout->addWidget(objectTable);
+    QPushButton *addObjectButton = new QPushButton("Add Object");
+    connect(addObjectButton, &QPushButton::clicked, this, &MainWindow::addObject);
+    objectsLayout->addWidget(addObjectButton);
+    QPushButton *removeObjectButton = new QPushButton("Remove Object");
+    connect(removeObjectButton, &QPushButton::clicked, this, &MainWindow::removeObject);
+    objectsLayout->addWidget(removeObjectButton);
+    tabs->addTab(objects, "Objects");
 
     mediaSources = new MediaSources();
     tabs->addTab(mediaSources, "Media");
