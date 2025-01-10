@@ -90,6 +90,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     objectTable->setModel(objectList);
     objectTable->horizontalHeader()->setStretchLastSection(true);
     objectTable->verticalHeader()->hide();
+    objectTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     objectTable->setItemDelegateForColumn(ObjectListColumns::TypeColumn, new ObjectTypeItemDelegate(objectTable));
     tabs->addTab(objectTable, "Objects");
 
@@ -111,26 +112,20 @@ void MainWindow::addObject() {
 }
 
 void MainWindow::removeObject() {
-    QModelIndexList selection = objectTable->selectionModel()->selectedIndexes();
-    QList<int> rowsToRemove;
-    for (QModelIndex index : selection) {
-        if (!rowsToRemove.contains(index.row())) {
-            rowsToRemove.append(index.row());
-        }
-    }
-    std::sort(rowsToRemove.begin(), rowsToRemove.end(), std::greater{});
-    if (rowsToRemove.size() <= 0) {
+    QModelIndexList selection = objectTable->selectionModel()->selectedRows();
+    if (selection.size() <= 0) {
         return;
     }
     QMessageBox messageBox;
-    messageBox.setText("Do you want to delete " + QString::number(rowsToRemove.size()) + " Objects?");
+    messageBox.setText("Do you want to delete " + QString::number(selection.size()) + " Objects?");
     messageBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
     messageBox.setDefaultButton(QMessageBox::Cancel);
     if (messageBox.exec() != QMessageBox::Ok) {
         return;
     }
-    for (const int row : rowsToRemove) {
-        objectList->removeRows(row, 1);
+    std::sort(selection.begin(), selection.end(), [](QModelIndex a, QModelIndex b) { return a.row() > b.row(); });
+    for (QModelIndex index : selection) {
+        objectList->removeRows(index.row(), 1);
     }
 }
 
