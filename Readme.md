@@ -7,12 +7,14 @@ See the [Releases page](https://github.com/arneBersch/dmxCanvas/releases/) to do
 
 ## Features
 * unlimited Virtual Beam Objects with Pan, Tilt, Zoom and CMY Color Mixing
-* unlimited Image Objects with X, Y, Zoom and Keystone correction
+* unlimited Image Objects with X, Y and Zoom
 * sACN (ANSI E1.31 input)
 * patch any Object to any DMX address
 
 ## Planned Features
+* Windows release
 * other Virtual Beam features (like gobo, frost, prism, shutter, framing)
+* other Image features
 * ArtNet input
 * Video player Objects
 * Audio player Objects
