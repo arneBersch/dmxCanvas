@@ -22,6 +22,7 @@ SOURCES += \
     main.cpp \
     mainwindow/mainwindow.cpp \
     media/mediasources.cpp \
+    objects/addressitemdelegate.cpp \
     objects/objectlist.cpp \
     objects/objecttypeitemdelegate.cpp \
     server/sacnserver.cpp
@@ -31,6 +32,7 @@ HEADERS += \
     canvaswindow/canvaswindow.h \
     mainwindow/mainwindow.h \
     media/mediasources.h \
+    objects/addressitemdelegate.h \
     objects/objectlist.h \
     objects/objecttypeitemdelegate.h \
     server/sacnserver.h

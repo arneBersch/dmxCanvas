@@ -3,8 +3,9 @@
 ObjectTypeItemDelegate::ObjectTypeItemDelegate(QObject *parent) : QStyledItemDelegate(parent) {}
 
 QWidget* ObjectTypeItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+    Q_UNUSED(option);
+    Q_UNUSED(index);
     QComboBox *comboBox = new QComboBox(parent);
-    const int row = index.row();
     comboBox->addItem("Virtual Beam");
     comboBox->addItem("Image");
     return comboBox;
