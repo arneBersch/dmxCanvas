@@ -38,23 +38,23 @@ void CanvasWindow::paintEvent(QPaintEvent *event) {
         int address = objects->data(objects->index(objectRow, ObjectListColumns::AddressColumn), Qt::DisplayRole).toInt();
         QString objectType = objects->data(objects->index(objectRow, ObjectListColumns::TypeColumn), Qt::DisplayRole).toString();
         if (objectType == "Virtual Beam") {
-            int x = sacn->dmxData[address - 1] * width() / 255;
-            int y = sacn->dmxData[address] * height() / 255;
-            int size = sacn->dmxData[address + 1] * height() / 255;
-            int alpha = sacn->dmxData[address + 2];
-            int red = 255 - sacn->dmxData[address + 3];
-            int green = 255 - sacn->dmxData[address + 4];
-            int blue = 255 - sacn->dmxData[address + 5];
+            int x = sacn->getChannelValue(address) * width() / 255;
+            int y = sacn->getChannelValue(address + 1) * height() / 255;
+            int size = sacn->getChannelValue(address + 2) * height() / 255;
+            int alpha = sacn->getChannelValue(address + 3);
+            int red = 255 - sacn->getChannelValue(address + 4);
+            int green = 255 - sacn->getChannelValue(address + 5);
+            int blue = 255 - sacn->getChannelValue(address + 6);
             QBrush brush(Qt::SolidPattern);
             brush.setColor(QColor(red, green, blue, alpha));
             painter.setBrush(brush);
             painter.drawEllipse((x - (size / 2)), (y - (size / 2)), size, size);
         } else if (objectType == "Image") {
-            int x = sacn->dmxData[address - 1] * width() / 255;
-            int y = sacn->dmxData[address] * height() / 255;
-            int size = sacn->dmxData[address + 1] * height() / 255;
-            int alpha = sacn->dmxData[address + 2];
-            int imageIndex = sacn->dmxData[address + 3];
+            int x = sacn->getChannelValue(address) * width() / 255;
+            int y = sacn->getChannelValue(address + 1) * height() / 255;
+            int size = sacn->getChannelValue(address + 2) * height() / 255;
+            int alpha = sacn->getChannelValue(address + 3);
+            int imageIndex = sacn->getChannelValue(address + 4);
             QString imagePath = QString();
             QDir directory = QDir(media->imageDirectory);
             if (directory.exists()) {
