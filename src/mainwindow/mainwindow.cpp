@@ -21,46 +21,50 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     QMenu *fileMenu = menuBar()->addMenu("File");
 
     QAction *newFileAction = new QAction("New File (Ctrl+N)");
-    fileMenu->addAction(newFileAction);
     connect(newFileAction, &QAction::triggered, this, &MainWindow::newFile);
+    fileMenu->addAction(newFileAction);
 
     QAction *openFileAction = new QAction("Open File (Ctrl+O)");
-    fileMenu->addAction(openFileAction);
     connect(openFileAction, &QAction::triggered, this, &MainWindow::openFile);
+    fileMenu->addAction(openFileAction);
 
     QAction *saveFileAction = new QAction("Save File (Ctrl+S)");
-    fileMenu->addAction(saveFileAction);
     connect(saveFileAction, &QAction::triggered, this, &MainWindow::saveFile);
+    fileMenu->addAction(saveFileAction);
 
     QAction *saveFileAsAction = new QAction("Save File as (Ctrl+Shift+S)");
-    fileMenu->addAction(saveFileAsAction);
     connect(saveFileAsAction, &QAction::triggered, this, &MainWindow::saveFileAs);
+    fileMenu->addAction(saveFileAsAction);
 
     fileMenu->addSeparator();
 
     QAction *quitAction = new QAction("Quit (Ctrl+Q)");
-    fileMenu->addAction(quitAction);
     connect(quitAction, &QAction::triggered, this, &MainWindow::close);
+    fileMenu->addAction(quitAction);
 
     QMenu *outputMenu = menuBar()->addMenu("Output");
 
     QAction *openFullscreenAction = new QAction("Open Canvas Fullscreen (F5)");
-    outputMenu->addAction(openFullscreenAction);
     connect(openFullscreenAction, &QAction::triggered, this, &MainWindow::openFullscreen);
+    outputMenu->addAction(openFullscreenAction);
 
     QAction *openWindowAction = new QAction("Open Canvas Window (Shift+F5)");
-    outputMenu->addAction(openWindowAction);
     connect(openWindowAction, &QAction::triggered, this, &MainWindow::openWindow);
+    outputMenu->addAction(openWindowAction);
 
     QMenu *helpMenu = menuBar()->addMenu("Help");
 
     QAction *aboutAction = new QAction("About dmxCanvas");
-    helpMenu->addAction(aboutAction);
     connect(aboutAction, &QAction::triggered, this, &MainWindow::about);
+    helpMenu->addAction(aboutAction);
 
-    QAction *openGuideAction = new QAction("Manual");
-    helpMenu->addAction(openGuideAction);
-    connect(openGuideAction, &QAction::triggered, this, []{ QDesktopServices::openUrl(QUrl("https://github.com/arneBersch/dmxCanvas/blob/main/docs/manual.md")); });
+    QAction *openManualAction = new QAction("Manual");
+    connect(openManualAction, &QAction::triggered, this, []{ QDesktopServices::openUrl(QUrl("https://github.com/arneBersch/dmxCanvas/blob/main/docs/manual.md")); });
+    helpMenu->addAction(openManualAction);
+
+    QAction *openDmxChartsAction = new QAction("DMX Charts");
+    connect(openDmxChartsAction, &QAction::triggered, this, []{ QDesktopServices::openUrl(QUrl("https://github.com/arneBersch/dmxCanvas/blob/main/docs/dmxCharts.md")); });
+    helpMenu->addAction(openDmxChartsAction);
 
     connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_N), this), &QShortcut::activated, this, &MainWindow::newFile); // New File
     connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_O), this), &QShortcut::activated, this, &MainWindow::openFile); // Open File
