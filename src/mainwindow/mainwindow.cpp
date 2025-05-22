@@ -45,11 +45,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     QMenu *outputMenu = menuBar()->addMenu("Output");
 
     QAction *openFullscreenAction = new QAction("Open Canvas Fullscreen (F5)");
-    connect(openFullscreenAction, &QAction::triggered, this, &MainWindow::openFullscreen);
+    connect(openFullscreenAction, &QAction::triggered, this, [this]{ openWindow(true); });
     outputMenu->addAction(openFullscreenAction);
 
     QAction *openWindowAction = new QAction("Open Canvas Window (Shift+F5)");
-    connect(openWindowAction, &QAction::triggered, this, &MainWindow::openWindow);
+    connect(openWindowAction, &QAction::triggered, this, [this]{ openWindow(false); });
     outputMenu->addAction(openWindowAction);
 
     QMenu *helpMenu = menuBar()->addMenu("Help");
@@ -71,8 +71,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_S), this), &QShortcut::activated, this, &MainWindow::saveFile); // Save File
     connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_S), this), &QShortcut::activated, this, &MainWindow::saveFileAs); // Save File As
     connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Q), this), &QShortcut::activated, this, &MainWindow::close); // Quit Application
-    connect(new QShortcut(QKeySequence(Qt::Key_F5), this), &QShortcut::activated, this, &MainWindow::openFullscreen); // Open Canvas Fullscreen
-    connect(new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F5), this), &QShortcut::activated, this, &MainWindow::openWindow); // Open Canvas Window
+    connect(new QShortcut(QKeySequence(Qt::Key_F5), this), &QShortcut::activated, this, [this]{ openWindow(true); }); // Open Canvas Fullscreen
+    connect(new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F5), this), &QShortcut::activated, this, [this]{ openWindow(false); }); // Open Canvas Window
 
     QTabWidget *tabs = new QTabWidget();
     tabs->setTabPosition(QTabWidget::South);
@@ -133,12 +133,8 @@ void MainWindow::removeObject() {
     }
 }
 
-void MainWindow::openWindow() {
-    new CanvasWindow(this, false, objectList, mediaSources, sacnServer);
-}
-
-void MainWindow::openFullscreen() {
-    new CanvasWindow(this, true, objectList, mediaSources, sacnServer);
+void MainWindow::openWindow(bool fullscreen) {
+    new CanvasWindow(this, fullscreen, objectList, mediaSources, sacnServer);
 }
 
 void MainWindow::openFile() {

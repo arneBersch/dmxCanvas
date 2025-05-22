@@ -29,8 +29,7 @@ public:
 private:
     void addObject();
     void removeObject();
-    void openWindow();
-    void openFullscreen();
+    void openWindow(bool fullscreen);
     void openFile();
     void newFile();
     void saveFile();
