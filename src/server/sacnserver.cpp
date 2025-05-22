@@ -77,7 +77,6 @@ void SacnServer::processPendingDatagrams() {
             && (data[121] == (char)0x00)
             && (data[122] == (char)0x01)) {
             receivedPackets++;
-            qDebug() << "Received E1.31 data packet " << receivedPackets;
             for (int channel = 0; channel < 511; channel++) {
                 if (channel <= (data.length() - 127)) {
                     dmxData[channel] = data[126 + channel];
