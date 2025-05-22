@@ -13,15 +13,17 @@
 
 namespace ObjectTypes {
 enum ObjectType {
-    VirtualBeam,
-    Image,
+    VirtualBeam7Channel,
+    VirtualBeam9Channel,
+    Image5Channel,
+    Image7Channel,
 };
 }
 
 struct Object {
     QString name = QString();
     int address = 1;
-    ObjectTypes::ObjectType type = ObjectTypes::VirtualBeam;
+    ObjectTypes::ObjectType type = ObjectTypes::VirtualBeam7Channel;
 };
 
 namespace ObjectListColumns {

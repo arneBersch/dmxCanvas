@@ -6,8 +6,10 @@ QWidget* ObjectTypeItemDelegate::createEditor(QWidget *parent, const QStyleOptio
     Q_UNUSED(option);
     Q_UNUSED(index);
     QComboBox *comboBox = new QComboBox(parent);
-    comboBox->addItem("Virtual Beam");
-    comboBox->addItem("Image");
+    comboBox->addItem("Virtual Beam (7 Channels)");
+    comboBox->addItem("Virtual Beam (9 Channels)");
+    comboBox->addItem("Image (5 Channels)");
+    comboBox->addItem("Image (7 Channels)");
     return comboBox;
 }
 

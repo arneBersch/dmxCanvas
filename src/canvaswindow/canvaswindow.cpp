@@ -37,9 +37,14 @@ void CanvasWindow::paintEvent(QPaintEvent *event) {
     for (int objectRow = 0; objectRow < objects->rowCount(); objectRow++) {
         int address = objects->data(objects->index(objectRow, ObjectListColumns::AddressColumn), Qt::DisplayRole).toInt();
         QString objectType = objects->data(objects->index(objectRow, ObjectListColumns::TypeColumn), Qt::DisplayRole).toString();
-        if (objectType == "Virtual Beam") {
+        if (objectType.startsWith("Virtual Beam")) {
             int x = sacn->getChannelValue(address) * width() / 255;
             int y = sacn->getChannelValue(address + 1) * height() / 255;
+            if (objectType.endsWith("(9 Channels)")) {
+                x = (sacn->getChannelValue(address) * 256 + sacn->getChannelValue(address + 1)) * width() / 65535;
+                y = (sacn->getChannelValue(address + 2) * 256 + sacn->getChannelValue(address + 3)) * height() / 65535;
+                address += 2;
+            }
             int size = sacn->getChannelValue(address + 2) * height() / 255;
             int alpha = sacn->getChannelValue(address + 3);
             int red = 255 - sacn->getChannelValue(address + 4);
@@ -49,9 +54,14 @@ void CanvasWindow::paintEvent(QPaintEvent *event) {
             brush.setColor(QColor(red, green, blue, alpha));
             painter.setBrush(brush);
             painter.drawEllipse((x - (size / 2)), (y - (size / 2)), size, size);
-        } else if (objectType == "Image") {
+        } else if (objectType.startsWith("Image")) {
             int x = sacn->getChannelValue(address) * width() / 255;
             int y = sacn->getChannelValue(address + 1) * height() / 255;
+            if (objectType.endsWith("(7 Channels)")) {
+                x = (sacn->getChannelValue(address) * 256 + sacn->getChannelValue(address + 1)) * width() / 65535;
+                y = (sacn->getChannelValue(address + 2) * 256 + sacn->getChannelValue(address + 3)) * height() / 65535;
+                address += 2;
+            }
             int size = sacn->getChannelValue(address + 2) * height() / 255;
             int alpha = sacn->getChannelValue(address + 3);
             int imageIndex = sacn->getChannelValue(address + 4);
@@ -60,7 +70,7 @@ void CanvasWindow::paintEvent(QPaintEvent *event) {
             if (directory.exists()) {
                 QStringList images = directory.entryList(QDir::Files);
                 foreach(QString fileName, images) {
-                    bool isNumber = true;
+                    bool isNumber = false;
                     int number = fileName.split(".")[0].toInt(&isNumber);
                     if (isNumber && (number == imageIndex)) {
                         imagePath = directory.absoluteFilePath(fileName);
@@ -79,10 +89,9 @@ void CanvasWindow::paintEvent(QPaintEvent *event) {
                 imagePainter.setCompositionMode(QPainter::CompositionMode_Darken);
                 imagePainter.drawImage(0, 0, mask);
                 imagePainter.end();
-                int width = (image.width() * size / image.height());
                 if (!image.isNull()) {
-                    QRect target((x - (width / 2)), (y - (size / 2)), width, size);
-                    painter.drawImage(target, image);
+                    int width = (image.width() * size / image.height());
+                    painter.drawImage(QRect((x - (width / 2)), (y - (size / 2)), width, size), image);
                 }
             }
         }

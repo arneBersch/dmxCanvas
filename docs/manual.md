@@ -11,7 +11,7 @@ You can check if dmxCanvas is receiving anything by checking the Received Packet
 ## Virtual Beams
 For setting up a Virtual Beam, just follow these steps:
 1. Add an Object.
-2. Set the Object's type to Virtual Beam.
+2. Set the Object's type to "Virtual Beam" and the required Mode.
 3. Set the Object's address (just like a physical lighting fixture).
 4. Check for any incoming sACN packets.
 5. Open the Canvas.
@@ -19,7 +19,7 @@ For setting up a Virtual Beam, just follow these steps:
 ## Images
 For setting up a Image, follow these steps:
 1. Add an Object.
-2. Set the Object's type to Image.
+2. Set the Object's type to "Image" and the required Mode.
 3. Set the Object's address (just like a physical lighting fixture).
 4. Select your Image folder (which has to contain Images numbered like 1.png, 2.jpeg, 3.svg, ...).
 5. Check for any incoming sACN packets.
