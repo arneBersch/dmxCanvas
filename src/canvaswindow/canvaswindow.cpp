@@ -63,7 +63,7 @@ void CanvasWindow::paintEvent(QPaintEvent *event) {
                 address += 2;
             }
             int size = sacn->getChannelValue(address + 2) * height() / 255;
-            int alpha = sacn->getChannelValue(address + 3);
+            int brightness = sacn->getChannelValue(address + 3);
             int imageIndex = sacn->getChannelValue(address + 4);
             QString imagePath = QString();
             QDir directory = QDir(media->imageDirectory);
@@ -79,16 +79,12 @@ void CanvasWindow::paintEvent(QPaintEvent *event) {
             }
             if (!imagePath.isEmpty()) {
                 QImage image(imagePath);
-                QImage mask(image);
-                QPainter imagePainter(&mask);
-                imagePainter.setCompositionMode(QPainter::CompositionMode_SourceIn);
-                imagePainter.fillRect(mask.rect(), QColor(alpha, alpha, alpha));
-                imagePainter.end();
-
-                imagePainter.begin(&image);
-                imagePainter.setCompositionMode(QPainter::CompositionMode_Darken);
-                imagePainter.drawImage(0, 0, mask);
-                imagePainter.end();
+                QImage alpha(image);
+                QPainter alphaPainter(&alpha);
+                alphaPainter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+                alphaPainter.fillRect(alpha.rect(), QColor(brightness, brightness, brightness));
+                alphaPainter.end();
+                image.setAlphaChannel(alpha);
                 if (!image.isNull()) {
                     int width = (image.width() * size / image.height());
                     painter.drawImage(QRect((x - (width / 2)), (y - (size / 2)), width, size), image);
