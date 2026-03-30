@@ -58,6 +58,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(aboutAction, &QAction::triggered, this, &MainWindow::about);
     helpMenu->addAction(aboutAction);
 
+    QAction *aboutQtAction = new QAction("About Qt");
+    connect(aboutQtAction, &QAction::triggered, this, []{ QApplication::aboutQt(); });
+    helpMenu->addAction(aboutQtAction);
+
     QAction *openManualAction = new QAction("Manual");
     connect(openManualAction, &QAction::triggered, this, []{ QDesktopServices::openUrl(QUrl("https://github.com/arneBersch/dmxCanvas/blob/main/docs/manual.md")); });
     helpMenu->addAction(openManualAction);
