@@ -1,7 +1,7 @@
 name: dmxCanvas GitHub Actions CI Build
-on: [ push, pull_request ]
+on: [ push ]
 env:
-  QT_VERSION: "6.8.0"
+  QT_VERSION: "6.8.*"
 
 jobs:
   linux:
@@ -42,3 +42,42 @@ jobs:
         with:
           name: dmxCanvas.AppImage
           path: src/dmxCanvas*.AppImage
+
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: src
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.Qt_VERSION }}
+
+      - name: Install Visual C++
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Compile
+        run: |
+          nmake clean
+          qmake -config release
+          nmake
+
+      - name: Deploy
+        run: |
+          cd release
+          windeployqt dmxCanvas.exe
+          7z a C:\dmxCanvas.zip *
+
+      - name: Upload executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: dmxCanvas.zip
+          path: C:\dmxCanvas.zip
+          

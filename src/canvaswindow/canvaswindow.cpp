@@ -23,6 +23,7 @@ CanvasWindow::CanvasWindow(QWidget *parent, bool fullscreen, ObjectList *objectL
         resize(720, 480);
         show();
     }
+    QImageReader::setAllocationLimit(0);
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, QOverload<>::of(&CanvasWindow::update));
@@ -37,52 +38,59 @@ void CanvasWindow::paintEvent(QPaintEvent *event) {
     for (int objectRow = 0; objectRow < objects->rowCount(); objectRow++) {
         int address = objects->data(objects->index(objectRow, ObjectListColumns::AddressColumn), Qt::DisplayRole).toInt();
         QString objectType = objects->data(objects->index(objectRow, ObjectListColumns::TypeColumn), Qt::DisplayRole).toString();
-        if (objectType == "Virtual Beam") {
-            int x = sacn->dmxData[address - 1] * width() / 255;
-            int y = sacn->dmxData[address] * height() / 255;
-            int size = sacn->dmxData[address + 1] * height() / 255;
-            int alpha = sacn->dmxData[address + 2];
-            int red = 255 - sacn->dmxData[address + 3];
-            int green = 255 - sacn->dmxData[address + 4];
-            int blue = 255 - sacn->dmxData[address + 5];
+        if (objectType.startsWith("Virtual Beam")) {
+            int x = sacn->getChannelValue(address) * width() / 255;
+            int y = sacn->getChannelValue(address + 1) * height() / 255;
+            if (objectType.endsWith("(9 Channels)")) {
+                x = (sacn->getChannelValue(address) * 256 + sacn->getChannelValue(address + 1)) * width() / 65535;
+                y = (sacn->getChannelValue(address + 2) * 256 + sacn->getChannelValue(address + 3)) * height() / 65535;
+                address += 2;
+            }
+            int size = sacn->getChannelValue(address + 2) * height() / 255;
+            int alpha = sacn->getChannelValue(address + 3);
+            int red = 255 - sacn->getChannelValue(address + 4);
+            int green = 255 - sacn->getChannelValue(address + 5);
+            int blue = 255 - sacn->getChannelValue(address + 6);
             QBrush brush(Qt::SolidPattern);
             brush.setColor(QColor(red, green, blue, alpha));
             painter.setBrush(brush);
             painter.drawEllipse((x - (size / 2)), (y - (size / 2)), size, size);
-        } else if (objectType == "Image") {
-            int x = sacn->dmxData[address - 1] * width() / 255;
-            int y = sacn->dmxData[address] * height() / 255;
-            int size = sacn->dmxData[address + 1] * height() / 255;
-            int alpha = sacn->dmxData[address + 2];
-            int imageIndex = sacn->dmxData[address + 3];
-            QString imagePath = QString();
-            QDir directory = QDir(media->imageDirectory);
-            if (directory.exists()) {
-                QStringList images = directory.entryList(QDir::Files);
-                foreach(QString fileName, images) {
-                    bool isNumber = true;
-                    int number = fileName.split(".")[0].toInt(&isNumber);
-                    if (isNumber && (number == imageIndex)) {
-                        imagePath = directory.absoluteFilePath(fileName);
+        } else if (objectType.startsWith("Image")) {
+            int x = sacn->getChannelValue(address) * width() / 255;
+            int y = sacn->getChannelValue(address + 1) * height() / 255;
+            if (objectType.endsWith("(7 Channels)")) {
+                x = (sacn->getChannelValue(address) * 256 + sacn->getChannelValue(address + 1)) * width() / 65535;
+                y = (sacn->getChannelValue(address + 2) * 256 + sacn->getChannelValue(address + 3)) * height() / 65535;
+                address += 2;
+            }
+            int size = sacn->getChannelValue(address + 2) * height() / 255;
+            int brightness = sacn->getChannelValue(address + 3);
+            int imageIndex = sacn->getChannelValue(address + 4);
+            if (brightness > 0) { // only display image if necessary
+                QString imagePath = QString();
+                QDir directory = QDir(media->imageDirectory);
+                if (directory.exists()) {
+                    QStringList images = directory.entryList(QDir::Files);
+                    foreach(QString fileName, images) {
+                        bool isNumber = false;
+                        int number = fileName.split(".")[0].toInt(&isNumber);
+                        if (isNumber && (number == imageIndex)) {
+                            imagePath = directory.absoluteFilePath(fileName);
+                        }
                     }
                 }
-            }
-            if (!imagePath.isEmpty()) {
-                QImage image(imagePath);
-                QImage mask(image);
-                QPainter imagePainter(&mask);
-                imagePainter.setCompositionMode(QPainter::CompositionMode_SourceIn);
-                imagePainter.fillRect(mask.rect(), QColor(alpha, alpha, alpha));
-                imagePainter.end();
-
-                imagePainter.begin(&image);
-                imagePainter.setCompositionMode(QPainter::CompositionMode_Darken);
-                imagePainter.drawImage(0, 0, mask);
-                imagePainter.end();
-                int width = (image.width() * size / image.height());
-                if (!image.isNull()) {
-                    QRect target((x - (width / 2)), (y - (size / 2)), width, size);
-                    painter.drawImage(target, image);
+                if (!imagePath.isEmpty()) {
+                    QImage image(imagePath);
+                    if (!image.isNull()) {
+                        QImage alpha(image);
+                        QPainter alphaPainter(&alpha);
+                        alphaPainter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+                        alphaPainter.fillRect(alpha.rect(), QColor(brightness, brightness, brightness));
+                        alphaPainter.end();
+                        image.setAlphaChannel(alpha);
+                        int width = (image.width() * size / image.height());
+                        painter.drawImage(QRect((x - (width / 2)), (y - (size / 2)), width, size), image);
+                    }
                 }
             }
         }

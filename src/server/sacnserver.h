@@ -16,7 +16,7 @@ class SacnServer : public QWidget {
     Q_OBJECT
 public:
     SacnServer();
-    uint8_t dmxData[512] = {0};
+    uint8_t getChannelValue(int channel);
     QSpinBox *universeSpinBox;
     const int SACN_PORT = 5568;
     const int SACN_MIN_UNIVERSE = 1;
@@ -26,6 +26,7 @@ private slots:
     void processPendingDatagrams();
 private:
     QUdpSocket *socket = new QUdpSocket();
+    uint8_t dmxData[512] = {0};
     QLabel *packetsCounterLabel;
     unsigned long receivedPackets = 0;
 };

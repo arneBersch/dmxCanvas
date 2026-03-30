@@ -27,7 +27,6 @@ SacnServer::SacnServer() {
     setUniverse(SACN_MIN_UNIVERSE);
 }
 
-
 void SacnServer::processPendingDatagrams() {
     while (socket->hasPendingDatagrams()) {
         QByteArray data = socket->receiveDatagram().data();
@@ -78,7 +77,6 @@ void SacnServer::processPendingDatagrams() {
             && (data[121] == (char)0x00)
             && (data[122] == (char)0x01)) {
             receivedPackets++;
-            qDebug() << "Received E1.31 data packet " << receivedPackets;
             for (int channel = 0; channel < 511; channel++) {
                 if (channel <= (data.length() - 127)) {
                     dmxData[channel] = data[126 + channel];
@@ -106,4 +104,11 @@ void SacnServer::setUniverse(int universe) {
     }
     connect(socket, &QUdpSocket::readyRead, this, &SacnServer::processPendingDatagrams);
     qDebug() << "Set sACN Universe to " << universe << " and Multicast address to " << address << ".";
+}
+
+uint8_t SacnServer::getChannelValue(int channel) {
+    if ((channel < 1) || (channel > 512)) {
+        return 0;
+    }
+    return dmxData[channel - 1];
 }

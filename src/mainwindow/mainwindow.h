@@ -15,6 +15,7 @@
 #include "canvaswindow/canvaswindow.h"
 #include "aboutwindow/aboutwindow.h"
 #include "objects/objectlist.h"
+#include "objects/addressitemdelegate.h"
 #include "objects/objecttypeitemdelegate.h"
 #include "media/mediasources.h"
 #include "server/sacnserver.h"
@@ -28,8 +29,7 @@ public:
 private:
     void addObject();
     void removeObject();
-    void openWindow();
-    void openFullscreen();
+    void openWindow(bool fullscreen);
     void openFile();
     void newFile();
     void saveFile();
@@ -42,7 +42,7 @@ private:
     SacnServer *sacnServer;
     QTableView *objectTable;
     QString filename;
-    const QString VERSION = "0.1.0";
-    const QString COPYRIGHT = "Copyright (c) 2025 Arne Bersch (zoeglfrex-dmx@web.de)";
+    const QString VERSION = "0.1.1";
+    const QString COPYRIGHT = "Copyright (c) 2026 Arne Bersch (zoeglfrex-dmx@web.de)";
 };
 #endif // MAINWINDOW_H

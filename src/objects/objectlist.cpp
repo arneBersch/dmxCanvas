@@ -35,10 +35,14 @@ QVariant ObjectList::data(const QModelIndex &index, const int role) const {
     } else if (column == ObjectListColumns::AddressColumn) {
         return (QString::number(object->address));
     } else if (column == ObjectListColumns::TypeColumn) {
-        if (object->type == ObjectTypes::VirtualBeam) {
-            return "Virtual Beam";
-        } else if (object->type == ObjectTypes::Image) {
-            return "Image";
+        if (object->type == ObjectTypes::VirtualBeam7Channel) {
+            return "Virtual Beam (7 Channels)";
+        } else if (object->type == ObjectTypes::VirtualBeam9Channel) {
+            return "Virtual Beam (9 Channels)";
+        } else if (object->type == ObjectTypes::Image5Channel) {
+            return "Image (5 Channels)";
+        } else if (object->type == ObjectTypes::Image7Channel) {
+            return "Image (7 Channels)";
         }
     }
     return QVariant();
@@ -54,25 +58,19 @@ bool ObjectList::setData(const QModelIndex &index, const QVariant &value, int ro
         } else if (column == ObjectListColumns::AddressColumn) {
             bool ok = false;
             int address = value.toInt(&ok);
-            int channels = 0;
-            if (object->type == ObjectTypes::VirtualBeam) {
-                channels = 7;
-            } else if (object->type == ObjectTypes::Image) {
-                channels = 5;
-            }
-            if (!ok || address < 1 || address > (513 - channels)) {
+            if (!ok || (address < 1) || (address > 512)) {
                 return false;
             }
             object->address = address;
         } else if (column == ObjectListColumns::TypeColumn) {
-            if (value.toString() == "Virtual Beam") {
-                if (object->address > 506) {
-                    object->address = 506;
-                    emit dataChanged(this->index(row, ObjectListColumns::AddressColumn), this->index(row, ObjectListColumns::AddressColumn), {Qt::DisplayRole, Qt::EditRole});
-                }
-                object->type = ObjectTypes::VirtualBeam;
-            } else if (value.toString() == "Image") {
-                object->type = ObjectTypes::Image;
+            if (value.toString() == "Virtual Beam (7 Channels)") {
+                object->type = ObjectTypes::VirtualBeam7Channel;
+            } else if (value.toString() == "Virtual Beam (9 Channels)") {
+                object->type = ObjectTypes::VirtualBeam9Channel;
+            } else if (value.toString() == "Image (5 Channels)") {
+                object->type = ObjectTypes::Image5Channel;
+            } else if (value.toString() == "Image (7 Channels)") {
+                object->type = ObjectTypes::Image7Channel;
             }
         }
         emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
