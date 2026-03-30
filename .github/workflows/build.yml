@@ -1,7 +1,7 @@
 name: dmxCanvas GitHub Actions CI Build
 on: [ push ]
 env:
-  QT_VERSION: "6.8.0"
+  QT_VERSION: "6.8.*"
 
 jobs:
   linux:
