@@ -24,12 +24,13 @@ SacnServer::SacnServer() {
     packetsCounterLabel = new QLabel(QString::number(receivedPackets));
     layout->addWidget(packetsCounterLabel, 2, 1);
 
-    setUniverse(SACN_MIN_UNIVERSE);
+    reset();
 }
 
 void SacnServer::processPendingDatagrams() {
     while (socket->hasPendingDatagrams()) {
         QByteArray data = socket->receiveDatagram().data();
+
         if ((data.size() >= 125)
             && (data.size() <= 638)
             // ROOT LAYER
@@ -75,15 +76,10 @@ void SacnServer::processPendingDatagrams() {
             && (data[120] == (char)0x00)
             // Address Increment
             && (data[121] == (char)0x00)
-            && (data[122] == (char)0x01)) {
+            && (data[122] == (char)0x01)
+        ) {
             receivedPackets++;
-            for (int channel = 0; channel < 511; channel++) {
-                if (channel <= (data.length() - 127)) {
-                    dmxData[channel] = data[126 + channel];
-                } else {
-                    dmxData[channel] = 0;
-                }
-            }
+            dmxData = data.sliced(126);
             packetsCounterLabel->setText(QString::number(receivedPackets));
         } else {
             qDebug() << "Received invalid data.";
@@ -92,15 +88,25 @@ void SacnServer::processPendingDatagrams() {
 }
 
 void SacnServer::setUniverse(int universe) {
-    QString address = SACN_ADDRESS_FORMAT.arg(universe / 256, universe % 256);
+    if (universe < SACN_MIN_UNIVERSE || universe > SACN_MAX_UNIVERSE) {
+        return;
+    }
+
+    if (universeSpinBox->value() != universe) {
+        universeSpinBox->setValue(universe);
+    }
+
+    const QHostAddress address = QHostAddress(SACN_ADDRESS_FORMAT.arg(universe / 256).arg(universe % 256));
+
     delete socket;
     socket = new QUdpSocket();
     socket->bind(QHostAddress::AnyIPv4, SACN_PORT);
     for (QNetworkInterface interface : QNetworkInterface::allInterfaces()) {
-        socket->joinMulticastGroup(QHostAddress(address), interface);
+        socket->joinMulticastGroup(address, interface);
     }
     connect(socket, &QUdpSocket::readyRead, this, &SacnServer::processPendingDatagrams);
-    qDebug() << "Set sACN Universe to " << universe << " and Multicast address to " << address << ".";
+
+    qDebug() << "Set sACN Universe to " << universe << " and Multicast address to " << address.toString() << ".";
 }
 
 int SacnServer::getUniverse() {
@@ -108,12 +114,13 @@ int SacnServer::getUniverse() {
 }
 
 void SacnServer::reset() {
-    universeSpinBox->setValue(SACN_MIN_UNIVERSE);
+    setUniverse(SACN_MIN_UNIVERSE);
 }
 
 uint8_t SacnServer::getChannelValue(int channel) {
-    if ((channel < 1) || (channel > 512)) {
+    if (channel < 1 || channel > dmxData.length()) {
         return 0;
     }
-    return dmxData[channel - 1];
+
+    return dmxData.at(channel - 1);
 }

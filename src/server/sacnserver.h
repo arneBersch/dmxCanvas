@@ -24,8 +24,6 @@ private slots:
     void processPendingDatagrams();
 private:
     QUdpSocket *socket = new QUdpSocket();
-    uint8_t dmxData[512] = {0};
-
     QLabel *packetsCounterLabel;
     QSpinBox *universeSpinBox;
 
@@ -34,6 +32,7 @@ private:
     const int SACN_MAX_UNIVERSE = 63999;
     const QString SACN_ADDRESS_FORMAT = "239.255.%1.%2";
 
+    QByteArray dmxData = QByteArray();
     unsigned long receivedPackets = 0;
 };
 

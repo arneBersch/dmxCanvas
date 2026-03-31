@@ -8,10 +8,10 @@
 
 #include "canvaswindow.h"
 
-CanvasWindow::CanvasWindow(QWidget *parent, bool fullscreen, ObjectList *objectList, MediaSources *mediaSources, SacnServer *sacnServer) : QWidget(parent, Qt::Window) {
+CanvasWindow::CanvasWindow(QWidget *parent, bool fullscreen, ObjectList *objectList, MediaSources *mediaSources, SacnServer *sacn) : QWidget(parent, Qt::Window) {
     objects = objectList;
     media = mediaSources;
-    sacnServer = sacnServer;
+    sacnServer = sacn;
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("dmxCanvas");
     setStyleSheet("background-color: black;");
