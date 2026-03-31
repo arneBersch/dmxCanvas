@@ -23,7 +23,7 @@ public:
 private:
     ObjectList *objects;
     MediaSources *media;
-    SacnServer *sacn;
+    SacnServer *sacnServer;
 };
 
 #endif // CANVASWINDOW_H

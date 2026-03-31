@@ -92,10 +92,7 @@ void SacnServer::processPendingDatagrams() {
 }
 
 void SacnServer::setUniverse(int universe) {
-    QString address = "239.255.";
-    address += QString::number(universe / 256);
-    address += ".";
-    address += QString::number(universe % 256);
+    QString address = SACN_ADDRESS_FORMAT.arg(universe / 256, universe % 256);
     delete socket;
     socket = new QUdpSocket();
     socket->bind(QHostAddress::AnyIPv4, SACN_PORT);
@@ -104,6 +101,14 @@ void SacnServer::setUniverse(int universe) {
     }
     connect(socket, &QUdpSocket::readyRead, this, &SacnServer::processPendingDatagrams);
     qDebug() << "Set sACN Universe to " << universe << " and Multicast address to " << address << ".";
+}
+
+int SacnServer::getUniverse() {
+    return universeSpinBox->value();
+}
+
+void SacnServer::reset() {
+    universeSpinBox->setValue(SACN_MIN_UNIVERSE);
 }
 
 uint8_t SacnServer::getChannelValue(int channel) {
