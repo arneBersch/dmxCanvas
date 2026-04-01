@@ -22,7 +22,7 @@ You can also find a [Manual](/docs/manual.md) for dmxCanvas.
 * Audio player Objects
 
 ## Known Limitations
-* Some sACN features (unicast, priority, synchronization, universe discovery) are not implemented yet and will therefore not work
+* Some sACN features (unicast, synchronization) are not implemented yet and will therefore not work
 
 ## How to contribute
 Please DO NOT post feature requests.
