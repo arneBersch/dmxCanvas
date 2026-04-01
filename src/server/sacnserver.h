@@ -22,18 +22,23 @@ public:
     int getUniverse();
 private slots:
     void processPendingDatagrams();
+    void dataLoss();
 private:
     QUdpSocket *socket = new QUdpSocket();
-    QLabel *packetsCounterLabel;
+    QLabel *priorityLabel;
+    QLabel *sourceLabel;
     QSpinBox *universeSpinBox;
+    QTimer* dataLossTimer;
 
     const int SACN_PORT = 5568;
     const int SACN_MIN_UNIVERSE = 1;
     const int SACN_MAX_UNIVERSE = 63999;
     const QString SACN_ADDRESS_FORMAT = "239.255.%1.%2";
+    const int SACN_MIN_PRIORITY = 0;
+    const int SACN_NETWORK_DATA_LOSS_TIMEOUT = 2500;
 
     QByteArray dmxData = QByteArray();
-    unsigned long receivedPackets = 0;
+    int priority;
 };
 
 #endif // SACNSERVER_H

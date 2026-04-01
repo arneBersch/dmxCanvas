@@ -19,12 +19,29 @@ SacnServer::SacnServer() {
     connect(universeSpinBox, &QSpinBox::valueChanged, this, &SacnServer::setUniverse);
     layout->addWidget(universeSpinBox, 0, 1);
 
-    QLabel *receivedPacketsLabel = new QLabel("Received Packets");
-    layout->addWidget(receivedPacketsLabel, 2, 0);
-    packetsCounterLabel = new QLabel(QString::number(receivedPackets));
-    layout->addWidget(packetsCounterLabel, 2, 1);
+    QLabel *receivedPacketsLabel = new QLabel("Priority");
+    layout->addWidget(receivedPacketsLabel, 1, 0);
+    priorityLabel = new QLabel();
+    layout->addWidget(priorityLabel, 1, 1);
 
+    QLabel *sourceNameLabel = new QLabel("Source Name");
+    layout->addWidget(sourceNameLabel, 2, 0);
+    sourceLabel = new QLabel();
+    layout->addWidget(sourceLabel, 2, 1);
+
+    dataLossTimer = new QTimer();
+    dataLossTimer->setSingleShot(true);
+    connect(dataLossTimer, &QTimer::timeout, this, &SacnServer::dataLoss);
+
+    dataLoss();
     reset();
+}
+
+void SacnServer::dataLoss() {
+    priority = SACN_MIN_PRIORITY;
+
+    priorityLabel->setText(QString::number(priority));
+    sourceLabel->setText("");
 }
 
 void SacnServer::processPendingDatagrams() {
@@ -78,9 +95,22 @@ void SacnServer::processPendingDatagrams() {
             && (data[121] == (char)0x00)
             && (data[122] == (char)0x01)
         ) {
-            receivedPackets++;
-            dmxData = data.sliced(126);
-            packetsCounterLabel->setText(QString::number(receivedPackets));
+            uint8_t dataPriority = data[108];
+
+            if (dataPriority >= priority) {
+                dmxData = data.sliced(126);
+                priority = dataPriority;
+                priorityLabel->setText(QString::number(priority));
+
+                QByteArray sourceName = data.mid(44, 64);
+                const int sourceNameLastIndex = sourceName.indexOf(0x00);
+                if (sourceNameLastIndex >= 0) {
+                    sourceName = sourceName.first(sourceNameLastIndex);
+                }
+                sourceLabel->setText(sourceName);
+
+                dataLossTimer->start(SACN_NETWORK_DATA_LOSS_TIMEOUT);
+            }
         } else {
             qDebug() << "Received invalid data.";
         }
