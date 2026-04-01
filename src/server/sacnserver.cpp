@@ -19,17 +19,12 @@ SacnServer::SacnServer() {
     connect(universeSpinBox, &QSpinBox::valueChanged, this, &SacnServer::setUniverse);
     layout->addWidget(universeSpinBox, 0, 1);
 
-    QLabel *receivedPacketsLabel = new QLabel("Priority");
-    layout->addWidget(receivedPacketsLabel, 1, 0);
-    priorityLabel = new QLabel();
-    layout->addWidget(priorityLabel, 1, 1);
-
-    QLabel *sourceNameLabel = new QLabel("Source Name");
-    layout->addWidget(sourceNameLabel, 2, 0);
+    QLabel *sourceNameLabel = new QLabel("Current Source");
+    layout->addWidget(sourceNameLabel, 1, 0);
     sourceLabel = new QLabel();
-    layout->addWidget(sourceLabel, 2, 1);
+    layout->addWidget(sourceLabel, 1, 1);
 
-    layout->setRowStretch(3, 1);
+    layout->setRowStretch(2, 1);
 
     dataLossTimer = new QTimer();
     dataLossTimer->setSingleShot(true);
@@ -42,13 +37,13 @@ SacnServer::SacnServer() {
 void SacnServer::dataLoss() {
     priority = SACN_MIN_PRIORITY;
 
-    priorityLabel->setText(QString::number(priority));
     sourceLabel->setText("<span style='background-color: red;'>Not connected</span>");
 }
 
 void SacnServer::processPendingDatagrams() {
     while (socket->hasPendingDatagrams()) {
-        QByteArray data = socket->receiveDatagram().data();
+        QNetworkDatagram datagram = socket->receiveDatagram();
+        QByteArray data = datagram.data();
 
         if ((data.size() >= 125)
             && (data.size() <= 638)
@@ -102,14 +97,13 @@ void SacnServer::processPendingDatagrams() {
             if (dataPriority >= priority) {
                 dmxData = data.sliced(126);
                 priority = dataPriority;
-                priorityLabel->setText(QString::number(priority));
 
                 QByteArray sourceName = data.mid(44, 64);
                 const int sourceNameLastIndex = sourceName.indexOf(0x00);
                 if (sourceNameLastIndex >= 0) {
                     sourceName = sourceName.first(sourceNameLastIndex);
                 }
-                sourceLabel->setText(sourceName);
+                sourceLabel->setText(sourceName + " (" + datagram.senderAddress().toString() + ")");
 
                 dataLossTimer->start(SACN_NETWORK_DATA_LOSS_TIMEOUT);
             }

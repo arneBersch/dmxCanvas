@@ -25,7 +25,6 @@ private slots:
     void dataLoss();
 private:
     QUdpSocket *socket = new QUdpSocket();
-    QLabel *priorityLabel;
     QLabel *sourceLabel;
     QSpinBox *universeSpinBox;
     QTimer* dataLossTimer;
