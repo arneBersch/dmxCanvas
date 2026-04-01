@@ -16,7 +16,7 @@ CanvasWindow::CanvasWindow(QWidget *parent, bool fullscreen, ObjectList *objectL
     setWindowTitle("dmxCanvas");
     setStyleSheet("background-color: black;");
     if (fullscreen) {
-        connect(new QShortcut(QKeySequence(Qt::Key_Escape), this), &QShortcut::activated, this, &CanvasWindow::close);
+        new QShortcut(Qt::Key_Escape, this, [this]{ close(); });
         setCursor(QCursor(Qt::BlankCursor));
         showFullScreen();
     } else {

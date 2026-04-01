@@ -70,13 +70,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(openDmxChartsAction, &QAction::triggered, this, []{ QDesktopServices::openUrl(QUrl("https://github.com/arneBersch/dmxCanvas/blob/main/docs/dmxCharts.md")); });
     helpMenu->addAction(openDmxChartsAction);
 
-    connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_N), this), &QShortcut::activated, this, &MainWindow::newFile); // New File
-    connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_O), this), &QShortcut::activated, this, &MainWindow::openFile); // Open File
-    connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_S), this), &QShortcut::activated, this, &MainWindow::saveFile); // Save File
-    connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_S), this), &QShortcut::activated, this, &MainWindow::saveFileAs); // Save File As
-    connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Q), this), &QShortcut::activated, this, &MainWindow::close); // Quit Application
-    connect(new QShortcut(QKeySequence(Qt::Key_F5), this), &QShortcut::activated, this, [this]{ openWindow(true); }); // Open Canvas Fullscreen
-    connect(new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F5), this), &QShortcut::activated, this, [this]{ openWindow(false); }); // Open Canvas Window
+    new QShortcut(Qt::CTRL | Qt::Key_N, this, [this]{ newFile(); });
+    new QShortcut(Qt::CTRL | Qt::Key_O, this, [this]{ openFile(); });
+    new QShortcut(Qt::CTRL | Qt::Key_S, this, [this]{ saveFile(); });
+    new QShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_S, this, [this]{ saveFileAs(); });
+    new QShortcut(Qt::CTRL | Qt::Key_Q, this, [this]{ close(); });
+    new QShortcut(Qt::Key_F5, this, [this]{ openWindow(true); });
+    new QShortcut(Qt::SHIFT | Qt::Key_F5, this, [this]{ openWindow(false); });
 
     QTabWidget *tabs = new QTabWidget();
     tabs->setTabPosition(QTabWidget::South);
@@ -212,23 +212,23 @@ void MainWindow::openFile() {
     filename = newFileName;
     if (fileStream.hasError()) {
         QMessageBox errorBox;
-        errorBox.setText("Can't open file because a XML passing error occured in line " + QString::number(fileStream.lineNumber()) + ": " + fileStream.errorString() + " (" + QString::number(fileStream.error()) + ")");
+        errorBox.setText("Can't open File because a XML parsing Error occured in Line " + QString::number(fileStream.lineNumber()) + ": " + fileStream.errorString() + " (" + QString::number(fileStream.error()) + ")");
         errorBox.exec();
         return;
     }
-    qDebug() << "Opened file " << filename;
+    qDebug() << "Opened File " << filename;
 }
 
 void MainWindow::newFile() {
     QMessageBox messageBox;
-    messageBox.setText("Are you sure you want to open a new file?");
+    messageBox.setText("Are you sure you want to open a new File?");
     messageBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
     messageBox.setDefaultButton(QMessageBox::Cancel);
     if (messageBox.exec() != QMessageBox::Ok) {
         return;
     }
     reset();
-    qDebug() << "Opened new file.";
+    qDebug() << "Opened new File.";
 }
 
 void MainWindow::saveFile() {
@@ -245,7 +245,7 @@ void MainWindow::saveFile() {
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly)) {
         QMessageBox errorBox;
-        errorBox.setText("Unable to save file.");
+        errorBox.setText("Unable to save File.");
         errorBox.exec();
         return;
     }
@@ -279,7 +279,7 @@ void MainWindow::saveFile() {
 
     fileStream.writeEndElement();
     fileStream.writeEndDocument();
-    qDebug() << "Saved file" << filename;
+    qDebug() << "Saved File" << filename;
 }
 
 void MainWindow::saveFileAs() {

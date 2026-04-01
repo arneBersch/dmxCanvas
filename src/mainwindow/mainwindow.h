@@ -30,8 +30,8 @@ private:
     void addObject();
     void removeObject();
     void openWindow(bool fullscreen);
-    void openFile();
     void newFile();
+    void openFile();
     void saveFile();
     void saveFileAs();
     void reset();

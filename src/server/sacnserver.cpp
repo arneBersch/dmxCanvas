@@ -29,6 +29,8 @@ SacnServer::SacnServer() {
     sourceLabel = new QLabel();
     layout->addWidget(sourceLabel, 2, 1);
 
+    layout->setRowStretch(3, 1);
+
     dataLossTimer = new QTimer();
     dataLossTimer->setSingleShot(true);
     connect(dataLossTimer, &QTimer::timeout, this, &SacnServer::dataLoss);
@@ -41,7 +43,7 @@ void SacnServer::dataLoss() {
     priority = SACN_MIN_PRIORITY;
 
     priorityLabel->setText(QString::number(priority));
-    sourceLabel->setText("");
+    sourceLabel->setText("<span style='background-color: red;'>Not connected</span>");
 }
 
 void SacnServer::processPendingDatagrams() {
