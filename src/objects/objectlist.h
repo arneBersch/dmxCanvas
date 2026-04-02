@@ -13,17 +13,17 @@
 
 namespace ObjectTypes {
 enum ObjectType {
-    VirtualBeam7Channel,
-    VirtualBeam9Channel,
-    Image5Channel,
-    Image7Channel,
+    VirtualBeam8Bit,
+    VirtualBeam16Bit,
+    Image8Bit,
+    Image16Bit,
 };
 }
 
 struct Object {
     QString name = QString();
     int address = 1;
-    ObjectTypes::ObjectType type = ObjectTypes::VirtualBeam7Channel;
+    ObjectTypes::ObjectType type = ObjectTypes::VirtualBeam8Bit;
 };
 
 namespace ObjectListColumns {
@@ -47,6 +47,11 @@ public:
     bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex()) override;
 private:
     QList<Object*> objects = QList<Object*>();
+
+    const QString VIRTUAL_BEAM_8BIT = "Virtual Beam (8 Channels)";
+    const QString VIRTUAL_BEAM_16BIT = "Virtual Beam (10 Channels)";
+    const QString IMAGE_8BIT = "Image (5 Channels)";
+    const QString IMAGE_16BIT = "Image (7 Channels)";
 };
 
 #endif // OBJECTLIST_H

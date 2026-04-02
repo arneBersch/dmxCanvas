@@ -47,13 +47,20 @@ void CanvasWindow::paintEvent(QPaintEvent *event) {
                 address += 2;
             }
             int size = sacnServer->getChannelValue(address + 2) * height() / 255;
-            int alpha = sacnServer->getChannelValue(address + 3);
-            int red = 255 - sacnServer->getChannelValue(address + 4);
-            int green = 255 - sacnServer->getChannelValue(address + 5);
-            int blue = 255 - sacnServer->getChannelValue(address + 6);
-            QBrush brush(Qt::SolidPattern);
-            brush.setColor(QColor(red, green, blue, alpha));
-            painter.setBrush(brush);
+            float diffusion = (float)sacnServer->getChannelValue(address + 3) / 255;
+            int alpha = sacnServer->getChannelValue(address + 4);
+            int red = 255 - sacnServer->getChannelValue(address + 5);
+            int green = 255 - sacnServer->getChannelValue(address + 6);
+            int blue = 255 - sacnServer->getChannelValue(address + 7);
+            QColor color = QColor(red, green, blue, alpha);
+            if (diffusion > 0) {
+                QRadialGradient gradient(x, y, size / 2);
+                gradient.setColorAt(1 - diffusion, color);
+                gradient.setColorAt(1, Qt::black);
+                painter.setBrush(gradient);
+            } else {
+                painter.setBrush(color);
+            }
             painter.drawEllipse((x - (size / 2)), (y - (size / 2)), size, size);
         } else if (objectType.startsWith("Image")) {
             int x = sacnServer->getChannelValue(address) * width() / 255;

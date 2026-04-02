@@ -5,10 +5,11 @@
 * Channel 1: Pan
 * Channel 2: Tilt
 * Channel 3: Zoom
-* Channel 4: Intensity
-* Channel 5: Cyan
-* Channel 6: Magenta
-* Channel 7: Yellow
+* Channel 4: Frost
+* Channel 5: Intensity
+* Channel 6: Cyan
+* Channel 7: Magenta
+* Channel 8: Yellow
 
 ### 9 Channel Mode
 * Channel 1: Pan
@@ -16,10 +17,11 @@
 * Channel 3: Tilt
 * Channel 4: Tilt fine
 * Channel 5: Zoom
-* Channel 6: Intensity
-* Channel 7: Cyan
-* Channel 8: Magenta
-* Channel 9: Yellow
+* Channel 6: Frost
+* Channel 7: Intensity
+* Channel 8: Cyan
+* Channel 9: Magenta
+* Channel 10: Yellow
 
 ## Image
 ### 5 Channel Mode
