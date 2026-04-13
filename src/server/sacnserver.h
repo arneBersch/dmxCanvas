@@ -12,6 +12,8 @@
 #include <QtWidgets>
 #include <QtNetwork>
 
+#include "sacndatagram.h"
+
 class SacnServer : public QWidget {
     Q_OBJECT
 public:
@@ -36,8 +38,8 @@ private:
     const int SACN_MIN_PRIORITY = 0;
     const int SACN_NETWORK_DATA_LOSS_TIMEOUT = 2500;
 
-    QByteArray dmxData = QByteArray();
     int priority;
+    SacnDatagram lastDatagram = SacnDatagram(QNetworkDatagram());
 };
 
 #endif // SACNSERVER_H

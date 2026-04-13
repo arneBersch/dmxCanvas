@@ -42,68 +42,12 @@ void SacnServer::dataLoss() {
 
 void SacnServer::processPendingDatagrams() {
     while (socket->hasPendingDatagrams()) {
-        QNetworkDatagram datagram = socket->receiveDatagram();
-        QByteArray data = datagram.data();
+        SacnDatagram datagram = SacnDatagram(socket->receiveDatagram());
 
-        if ((data.size() >= 125)
-            && (data.size() <= 638)
-            // ROOT LAYER
-            // Preamble Size
-            && (data[0] == (char)0x00)
-            && (data[1] == (char)0x10)
-            // Post-amble Size
-            && (data[2] == (char)0x00)
-            && (data[3] == (char)0x00)
-            // ACN Packet Identifier
-            && (data[4] == (char)0x41)
-            && (data[5] == (char)0x53)
-            && (data[6] == (char)0x43)
-            && (data[7] == (char)0x2d)
-            && (data[8] == (char)0x45)
-            && (data[9] == (char)0x31)
-            && (data[10] == (char)0x2e)
-            && (data[11] == (char)0x31)
-            && (data[12] == (char)0x37)
-            && (data[13] == (char)0x00)
-            && (data[14] == (char)0x00)
-            && (data[15] == (char)0x00)
-            // Vector
-            && (data[18] == (char)0x00)
-            && (data[19] == (char)0x00)
-            && (data[20] == (char)0x00)
-            && (data[21] == (char)0x04)
-            // FRAMING LAYER
-            // Vector
-            && (data[40] == (char)0x00)
-            && (data[41] == (char)0x00)
-            && (data[42] == (char)0x00)
-            && (data[43] == (char)0x02)
-            // Universe
-            && (((256 * (uint8_t)data[113]) + (uint8_t)data[114]) == universeSpinBox->value())
-            // DMP LAYER
-            // Vector
-            && (data[117] == (char)0x02)
-            // Address Type & Data Type
-            && (data[118] == (char)0xa1)
-            // First Property Address
-            && (data[119] == (char)0x00)
-            && (data[120] == (char)0x00)
-            // Address Increment
-            && (data[121] == (char)0x00)
-            && (data[122] == (char)0x01)
-        ) {
-            uint8_t dataPriority = data[108];
-
-            if (dataPriority >= priority) {
-                dmxData = data.sliced(126);
-                priority = dataPriority;
-
-                QByteArray sourceName = data.mid(44, 64);
-                const int sourceNameLastIndex = sourceName.indexOf(0x00);
-                if (sourceNameLastIndex >= 0) {
-                    sourceName = sourceName.first(sourceNameLastIndex);
-                }
-                sourceLabel->setText(sourceName + " (" + datagram.senderAddress().toString() + ")");
+        if (datagram.isValid()) {
+            if (datagram.getPriority() >= priority) {
+                lastDatagram = datagram;
+                priority = datagram.getPriority();
 
                 dataLossTimer->start(SACN_NETWORK_DATA_LOSS_TIMEOUT);
             }
@@ -144,9 +88,5 @@ void SacnServer::reset() {
 }
 
 uint8_t SacnServer::getChannelValue(int channel) {
-    if (channel < 1 || channel > dmxData.length()) {
-        return 0;
-    }
-
-    return dmxData.at(channel - 1);
+    return lastDatagram.getChannel(channel);
 }

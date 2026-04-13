@@ -25,6 +25,7 @@ SOURCES += \
     objects/addressitemdelegate.cpp \
     objects/objectlist.cpp \
     objects/objecttypeitemdelegate.cpp \
+    server/sacndatagram.cpp \
     server/sacnserver.cpp
 
 HEADERS += \
@@ -35,6 +36,7 @@ HEADERS += \
     objects/addressitemdelegate.h \
     objects/objectlist.h \
     objects/objecttypeitemdelegate.h \
+    server/sacndatagram.h \
     server/sacnserver.h
 
 # Default rules for deployment.
