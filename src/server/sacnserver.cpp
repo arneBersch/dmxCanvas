@@ -19,8 +19,8 @@ SacnServer::SacnServer() {
     connect(universeSpinBox, &QSpinBox::valueChanged, this, &SacnServer::setUniverse);
     layout->addWidget(universeSpinBox, 0, 1);
 
-    QLabel *sourceNameLabel = new QLabel("Current Source");
-    layout->addWidget(sourceNameLabel, 1, 0);
+    QLabel *statusLabel = new QLabel("Status");
+    layout->addWidget(statusLabel, 1, 0);
     sourceLabel = new QLabel();
     layout->addWidget(sourceLabel, 1, 1);
 
@@ -37,17 +37,20 @@ SacnServer::SacnServer() {
 void SacnServer::dataLoss() {
     priority = SACN_MIN_PRIORITY;
 
-    sourceLabel->setText("<span style='background-color: red;'>Not connected</span>");
+    sourceLabel->setText("Not Connected");
+    sourceLabel->setStyleSheet("* { background-color: red; }");
 }
 
 void SacnServer::processPendingDatagrams() {
     while (socket->hasPendingDatagrams()) {
         SacnDatagram datagram = SacnDatagram(socket->receiveDatagram());
 
-        if (datagram.isValid()) {
+        if (datagram.isValid() && (datagram.getUniverse() == universeSpinBox->value())) {
             if (datagram.getPriority() >= priority) {
                 lastDatagram = datagram;
                 priority = datagram.getPriority();
+                sourceLabel->setText("Connected: " + datagram.getSource());
+                sourceLabel->setStyleSheet("* { background-color: green; }");
 
                 dataLossTimer->start(SACN_NETWORK_DATA_LOSS_TIMEOUT);
             }

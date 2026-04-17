@@ -82,8 +82,13 @@ QString SacnDatagram::getSource() {
         return QString();
     }
 
-    QString sourceName = QString::fromUtf8(data.mid(44, 64));
-    return sourceName + " (" + sourceAddress.toString() + ")";
+    QByteArray sourceName = data.mid(44, 64);
+    int nullIndex = sourceName.indexOf(0x00);
+    if (nullIndex >= 0) {
+        sourceName = sourceName.first(nullIndex);
+    }
+
+    return QString("%1 (%2)").arg(QString::fromUtf8(sourceName)).arg(sourceAddress.toString());
 }
 
 bool SacnDatagram::checkFlagsAndLength(int index) {
