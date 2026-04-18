@@ -6,24 +6,6 @@
     You should have received a copy of the GNU General Public License along with dmxCanvas. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef OBJECTMANAGER_H
-#define OBJECTMANAGER_H
+#include "canvasobject.h"
 
-#include <QtWidgets>
-
-#include "objectlist.h"
-#include "addressitemdelegate.h"
-#include "objecttypeitemdelegate.h"
-
-class ObjectManager : public QWidget {
-    Q_OBJECT
-public:
-    ObjectManager(ObjectList* objectList, QWidget* parent = nullptr);
-private:
-    void addObject();
-    void removeObject();
-    ObjectList* objectList;
-    QTableView *objectTable;
-};
-
-#endif // OBJECTMANAGER_H
+CanvasObject::CanvasObject() {}

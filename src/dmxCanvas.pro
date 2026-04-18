@@ -23,6 +23,7 @@ SOURCES += \
     mainwindow/mainwindow.cpp \
     media/mediasources.cpp \
     objects/addressitemdelegate.cpp \
+    objects/canvasobject.cpp \
     objects/objectlist.cpp \
     objects/objectmanager.cpp \
     objects/objecttypeitemdelegate.cpp \
@@ -35,6 +36,7 @@ HEADERS += \
     mainwindow/mainwindow.h \
     media/mediasources.h \
     objects/addressitemdelegate.h \
+    objects/canvasobject.h \
     objects/objectlist.h \
     objects/objectmanager.h \
     objects/objecttypeitemdelegate.h \

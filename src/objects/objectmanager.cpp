@@ -19,8 +19,8 @@ ObjectManager::ObjectManager(ObjectList* objects, QWidget* parent) : QWidget(par
     objectTable->horizontalHeader()->setStretchLastSection(true);
     objectTable->verticalHeader()->hide();
     objectTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-    //objectTable->setItemDelegateForColumn(ObjectListColumns::AddressColumn, new AddressItemDelegate(objectTable));
-    //objectTable->setItemDelegateForColumn(ObjectListColumns::TypeColumn, new ObjectTypeItemDelegate(objectTable));
+    objectTable->setItemDelegateForColumn(ObjectListColumns::AddressColumn, new AddressItemDelegate(objectTable));
+    objectTable->setItemDelegateForColumn(ObjectListColumns::TypeColumn, new ObjectTypeItemDelegate(objectTable));
     objectsLayout->addWidget(objectTable);
     QPushButton *addObjectButton = new QPushButton("Add Object");
     connect(addObjectButton, &QPushButton::clicked, this, &ObjectManager::addObject);

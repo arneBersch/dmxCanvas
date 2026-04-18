@@ -29,7 +29,7 @@ QVariant ObjectList::data(const QModelIndex &index, const int role) const {
     if (row >= rowCount() || row < 0) {
         return QVariant();
     }
-    Object* object = objects[row];
+    CanvasObject* object = objects[row];
     if (column == ObjectListColumns::NameColumn) {
         return object->name;
     } else if (column == ObjectListColumns::AddressColumn) {
@@ -52,7 +52,7 @@ bool ObjectList::setData(const QModelIndex &index, const QVariant &value, int ro
     if (index.isValid() && role == Qt::EditRole) {
         const int row = index.row();
         const int column = index.column();
-        Object* object = objects[row];
+        CanvasObject* object = objects[row];
         if (column == ObjectListColumns::NameColumn) {
             object->name = value.toString();
         } else if (column == ObjectListColumns::AddressColumn) {
@@ -107,7 +107,7 @@ bool ObjectList::insertRows(int position, int rows, const QModelIndex &index) {
     Q_UNUSED(index);
     beginInsertRows(QModelIndex(), position, (position + rows - 1));
     for (int row = 0; row < rows; row++) {
-        Object* object = new Object();
+        CanvasObject* object = new CanvasObject();
         objects.insert(position, object);
     }
     endInsertRows();
@@ -118,7 +118,7 @@ bool ObjectList::removeRows(int position, int rows, const QModelIndex &index) {
     Q_UNUSED(index);
     beginRemoveRows(QModelIndex(), position, (position + rows - 1));
     for (int row = 0; row < rows; row++) {
-        Object* object = objects[position];
+        CanvasObject* object = objects[position];
         objects.removeAt(position);
         delete object;
     }
