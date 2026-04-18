@@ -23,8 +23,17 @@ enum ObjectType {
 class CanvasObject {
 public:
     CanvasObject();
+    QString getName();
+    void setName(QString name);
+    int getAddress();
+    void setAddress(int address);
+    ObjectTypes::ObjectType getType();
+    void setType(ObjectTypes::ObjectType objectType);
+    static const int MIN_ADDRESS = 1;
+    static const int MAX_ADDRESS = 512;
+private:
     QString name = QString();
-    int address = 1;
+    int address = MIN_ADDRESS;
     ObjectTypes::ObjectType type = ObjectTypes::VirtualBeam8Bit;
 };
 

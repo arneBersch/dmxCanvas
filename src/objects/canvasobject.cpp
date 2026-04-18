@@ -9,3 +9,31 @@
 #include "canvasobject.h"
 
 CanvasObject::CanvasObject() {}
+
+QString CanvasObject::getName() {
+    return name;
+}
+
+void CanvasObject::setName(QString newName) {
+    name = newName;
+}
+
+int CanvasObject::getAddress() {
+    return address;
+}
+
+void CanvasObject::setAddress(int newAddress) {
+    if (newAddress < MIN_ADDRESS || newAddress > MAX_ADDRESS) {
+        return;
+    }
+
+    address = newAddress;
+}
+
+ObjectTypes::ObjectType CanvasObject::getType() {
+    return type;
+}
+
+void CanvasObject::setType(ObjectTypes::ObjectType objectType) {
+    type = objectType;
+}

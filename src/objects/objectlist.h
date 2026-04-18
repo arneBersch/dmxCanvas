@@ -34,7 +34,6 @@ public:
     bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex()) override;
 private:
     QList<CanvasObject*> objects = QList<CanvasObject*>();
-
     const QString VIRTUAL_BEAM_8BIT = "Virtual Beam (8 Channels)";
     const QString VIRTUAL_BEAM_16BIT = "Virtual Beam (10 Channels)";
     const QString IMAGE_8BIT = "Image (5 Channels)";

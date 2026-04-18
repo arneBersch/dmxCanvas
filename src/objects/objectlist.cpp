@@ -31,17 +31,17 @@ QVariant ObjectList::data(const QModelIndex &index, const int role) const {
     }
     CanvasObject* object = objects[row];
     if (column == ObjectListColumns::NameColumn) {
-        return object->name;
+        return object->getName();
     } else if (column == ObjectListColumns::AddressColumn) {
-        return (QString::number(object->address));
+        return (QString::number(object->getAddress()));
     } else if (column == ObjectListColumns::TypeColumn) {
-        if (object->type == ObjectTypes::VirtualBeam8Bit) {
+        if (object->getType() == ObjectTypes::VirtualBeam8Bit) {
             return VIRTUAL_BEAM_8BIT;
-        } else if (object->type == ObjectTypes::VirtualBeam16Bit) {
+        } else if (object->getType() == ObjectTypes::VirtualBeam16Bit) {
             return VIRTUAL_BEAM_16BIT;
-        } else if (object->type == ObjectTypes::Image8Bit) {
+        } else if (object->getType() == ObjectTypes::Image8Bit) {
             return IMAGE_8BIT;
-        } else if (object->type == ObjectTypes::Image16Bit) {
+        } else if (object->getType() == ObjectTypes::Image16Bit) {
             return IMAGE_16BIT;
         }
     }
@@ -54,23 +54,23 @@ bool ObjectList::setData(const QModelIndex &index, const QVariant &value, int ro
         const int column = index.column();
         CanvasObject* object = objects[row];
         if (column == ObjectListColumns::NameColumn) {
-            object->name = value.toString();
+            object->setName(value.toString());
         } else if (column == ObjectListColumns::AddressColumn) {
             bool ok = false;
             int address = value.toInt(&ok);
-            if (!ok || (address < 1) || (address > 512)) {
+            if (!ok) {
                 return false;
             }
-            object->address = address;
+            object->setAddress(address);
         } else if (column == ObjectListColumns::TypeColumn) {
             if (value.toString() == VIRTUAL_BEAM_8BIT) {
-                object->type = ObjectTypes::VirtualBeam8Bit;
+                object->setType(ObjectTypes::VirtualBeam8Bit);
             } else if (value.toString() == VIRTUAL_BEAM_16BIT) {
-                object->type = ObjectTypes::VirtualBeam16Bit;
+                object->setType(ObjectTypes::VirtualBeam16Bit);
             } else if (value.toString() == IMAGE_8BIT) {
-                object->type = ObjectTypes::Image8Bit;
+                object->setType(ObjectTypes::Image8Bit);
             } else if (value.toString() == IMAGE_16BIT) {
-                object->type = ObjectTypes::Image16Bit;
+                object->setType(ObjectTypes::Image16Bit);
             }
         }
         emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
