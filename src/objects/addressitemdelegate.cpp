@@ -14,7 +14,7 @@ QWidget* AddressItemDelegate::createEditor(QWidget *parent, const QStyleOptionVi
     Q_UNUSED(option);
     Q_UNUSED(index);
     QSpinBox *spinBox = new QSpinBox(parent);
-    spinBox->setRange(1, 512);
+    spinBox->setRange(CanvasObject::MIN_ADDRESS, CanvasObject::MAX_ADDRESS);
     return spinBox;
 }
 

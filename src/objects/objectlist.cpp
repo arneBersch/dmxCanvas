@@ -125,3 +125,9 @@ bool ObjectList::removeRows(int position, int rows, const QModelIndex &index) {
     endRemoveRows();
     return true;
 }
+
+void ObjectList::drawObjects(QPainter* painter, MediaSources* media, SacnServer* sacn) {
+    for (CanvasObject* object : objects) {
+        object->draw(painter, media, sacn);
+    }
+}

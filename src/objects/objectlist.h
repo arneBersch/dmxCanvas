@@ -32,6 +32,7 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     bool insertRows(int position, int rows, const QModelIndex &index = QModelIndex()) override;
     bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex()) override;
+    void drawObjects(QPainter* painter, MediaSources* media, SacnServer* sacnServer);
 private:
     QList<CanvasObject*> objects = QList<CanvasObject*>();
     const QString VIRTUAL_BEAM_8BIT = "Virtual Beam (8 Channels)";

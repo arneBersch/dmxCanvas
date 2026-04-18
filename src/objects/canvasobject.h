@@ -11,6 +11,9 @@
 
 #include <QtWidgets>
 
+#include "media/mediasources.h"
+#include "server/sacnserver.h"
+
 namespace ObjectTypes {
 enum ObjectType {
     VirtualBeam8Bit,
@@ -29,6 +32,8 @@ public:
     void setAddress(int address);
     ObjectTypes::ObjectType getType();
     void setType(ObjectTypes::ObjectType objectType);
+    void draw(QPainter* painter, MediaSources* media, SacnServer* sacn);
+
     static const int MIN_ADDRESS = 1;
     static const int MAX_ADDRESS = 512;
 private:

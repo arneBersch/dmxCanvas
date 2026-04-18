@@ -11,6 +11,8 @@
 
 #include <QtWidgets>
 
+#include "canvasobject.h"
+
 class AddressItemDelegate : public QStyledItemDelegate {
     Q_OBJECT
 public:
