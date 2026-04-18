@@ -24,6 +24,7 @@ SOURCES += \
     media/mediasources.cpp \
     objects/addressitemdelegate.cpp \
     objects/objectlist.cpp \
+    objects/objectmanager.cpp \
     objects/objecttypeitemdelegate.cpp \
     server/sacndatagram.cpp \
     server/sacnserver.cpp
@@ -35,6 +36,7 @@ HEADERS += \
     media/mediasources.h \
     objects/addressitemdelegate.h \
     objects/objectlist.h \
+    objects/objectmanager.h \
     objects/objecttypeitemdelegate.h \
     server/sacndatagram.h \
     server/sacnserver.h

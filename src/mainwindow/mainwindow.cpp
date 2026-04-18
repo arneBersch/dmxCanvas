@@ -80,27 +80,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     QTabWidget *tabs = new QTabWidget();
     tabs->setTabPosition(QTabWidget::South);
-    this->setCentralWidget(tabs);
+    setCentralWidget(tabs);
 
-    QVBoxLayout *objectsLayout = new QVBoxLayout();
-    QWidget *objects = new QWidget;
-    objects->setLayout(objectsLayout);
-    objectTable = new QTableView();
     objectList = new ObjectList();
-    objectTable->setModel(objectList);
-    objectTable->horizontalHeader()->setStretchLastSection(true);
-    objectTable->verticalHeader()->hide();
-    objectTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-    objectTable->setItemDelegateForColumn(ObjectListColumns::AddressColumn, new AddressItemDelegate(objectTable));
-    objectTable->setItemDelegateForColumn(ObjectListColumns::TypeColumn, new ObjectTypeItemDelegate(objectTable));
-    objectsLayout->addWidget(objectTable);
-    QPushButton *addObjectButton = new QPushButton("Add Object");
-    connect(addObjectButton, &QPushButton::clicked, this, &MainWindow::addObject);
-    objectsLayout->addWidget(addObjectButton);
-    QPushButton *removeObjectButton = new QPushButton("Remove Object");
-    connect(removeObjectButton, &QPushButton::clicked, this, &MainWindow::removeObject);
-    objectsLayout->addWidget(removeObjectButton);
-    tabs->addTab(objects, "Objects");
+    objectManager = new ObjectManager(objectList);
+    tabs->addTab(objectManager, "Objects");
 
     mediaSources = new MediaSources();
     tabs->addTab(mediaSources, "Media");
@@ -108,33 +92,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     sacnServer = new SacnServer();
     tabs->addTab(sacnServer, "Input");
 
-    this->show(); // Show window
-    about(); // Open about window
-}
-
-MainWindow::~MainWindow() {
-}
-
-void MainWindow::addObject() {
-    objectList->insertRows(objectList->rowCount(), 1);
-}
-
-void MainWindow::removeObject() {
-    QModelIndexList selection = objectTable->selectionModel()->selectedRows();
-    if (selection.size() <= 0) {
-        return;
-    }
-    QMessageBox messageBox;
-    messageBox.setText("Do you want to delete " + QString::number(selection.size()) + " Objects?");
-    messageBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
-    messageBox.setDefaultButton(QMessageBox::Cancel);
-    if (messageBox.exec() != QMessageBox::Ok) {
-        return;
-    }
-    std::sort(selection.begin(), selection.end(), [](QModelIndex a, QModelIndex b) { return a.row() > b.row(); });
-    for (QModelIndex index : selection) {
-        objectList->removeRows(index.row(), 1);
-    }
+    show();
+    about();
 }
 
 void MainWindow::openWindow(bool fullscreen) {
