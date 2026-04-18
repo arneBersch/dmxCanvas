@@ -42,7 +42,7 @@ private:
     SacnServer *sacnServer;
     QTableView *objectTable;
     QString filename;
-    const QString VERSION = "0.1.1";
+    const QString VERSION = "0.2.0";
     const QString COPYRIGHT = "Copyright (c) 2026 Arne Bersch (zoeglfrex-dmx@web.de)";
 };
 #endif // MAINWINDOW_H

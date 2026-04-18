@@ -146,6 +146,7 @@ void MainWindow::openFile() {
     if (newFileName.isEmpty()) {
         return;
     }
+
     QFile file(newFileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QMessageBox errorBox;
@@ -153,7 +154,9 @@ void MainWindow::openFile() {
         errorBox.exec();
         return;
     }
+
     reset();
+
     QXmlStreamReader fileStream(&file);
     if ((fileStream.readNextStartElement()) && (fileStream.name().toString() == "Workspace")) {
         while (fileStream.readNextStartElement()) {
@@ -209,13 +212,16 @@ void MainWindow::openFile() {
             }
         }
     }
+
     filename = newFileName;
+
     if (fileStream.hasError()) {
         QMessageBox errorBox;
         errorBox.setText("Can't open File because a XML parsing Error occured in Line " + QString::number(fileStream.lineNumber()) + ": " + fileStream.errorString() + " (" + QString::number(fileStream.error()) + ")");
         errorBox.exec();
         return;
     }
+
     qDebug() << "Opened File " << filename;
 }
 
@@ -236,12 +242,13 @@ void MainWindow::saveFile() {
         QString filenameFilter = "dmxc Files (*.dmxc)";
         filename = QFileDialog::getSaveFileName(this, "Save File", QString(), filenameFilter, &filenameFilter);
         if (filename.isEmpty()) {
-            return; // don't save if no valid file name was given
+            return;
         }
         if (!filename.endsWith(".dmxc")) {
             filename += ".dmxc";
         }
     }
+
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly)) {
         QMessageBox errorBox;
@@ -249,6 +256,7 @@ void MainWindow::saveFile() {
         errorBox.exec();
         return;
     }
+
     QXmlStreamWriter fileStream(&file);
     fileStream.setAutoFormatting(true);
     fileStream.writeStartDocument();
@@ -270,7 +278,7 @@ void MainWindow::saveFile() {
     fileStream.writeEndElement();
 
     fileStream.writeStartElement("Media");
-    fileStream.writeTextElement("Images", mediaSources->imageDirectory);
+    fileStream.writeTextElement("Images", mediaSources->getImageDirectory());
     fileStream.writeEndElement();
 
     fileStream.writeStartElement("Input");

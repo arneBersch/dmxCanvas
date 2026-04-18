@@ -75,7 +75,7 @@ void CanvasWindow::paintEvent(QPaintEvent *event) {
             int imageIndex = sacnServer->getChannelValue(address + 4);
             if (brightness > 0) { // only display image if necessary
                 QString imagePath = QString();
-                QDir directory = QDir(media->imageDirectory);
+                QDir directory = QDir(media->getImageDirectory());
                 if (directory.exists()) {
                     QStringList images = directory.entryList(QDir::Files);
                     foreach(QString fileName, images) {

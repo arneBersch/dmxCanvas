@@ -8,10 +8,11 @@ class MediaSources : public QWidget {
 public:
     MediaSources();
     void resetSources();
-    QString imageDirectory;
+    QString getImageDirectory();
 public slots:
     void setImageDirectory(QString directory = QString());
 private:
+    QString imageDirectory;
     QPushButton *imageSourceButton;
 };
 

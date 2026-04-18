@@ -16,6 +16,10 @@ void MediaSources::resetSources() {
     this->setImageDirectory("");
 }
 
+QString MediaSources::getImageDirectory() {
+    return imageDirectory;
+}
+
 void MediaSources::setImageDirectory(QString newDirectory) {
     if (newDirectory.isNull()) {
         newDirectory = QFileDialog::getExistingDirectory(this, "Selet Image Directory", imageDirectory);
