@@ -42,17 +42,22 @@ void CanvasObject::draw(QPainter* painter, MediaSources* media, SacnServer* sacn
     if (type == ObjectTypes::VirtualBeam8Bit || type == ObjectTypes::VirtualBeam16Bit) {
         int x = sacnServer->getChannelValue(address) * painter->window().width() / 255;
         int y = sacnServer->getChannelValue(address + 1) * painter->window().height() / 255;
-        if (type == ObjectTypes::VirtualBeam16Bit) {
-            x = (sacnServer->getChannelValue(address) * 256 + sacnServer->getChannelValue(address + 1)) * painter->window().width() / 65535;
-            y = (sacnServer->getChannelValue(address + 2) * 256 + sacnServer->getChannelValue(address + 3)) * painter->window().height() / 65535;
-            address += 2;
-        }
         int size = sacnServer->getChannelValue(address + 2) * painter->window().height() / 255;
         float diffusion = (float)sacnServer->getChannelValue(address + 3) / 255;
         int alpha = sacnServer->getChannelValue(address + 4);
         int red = 255 - sacnServer->getChannelValue(address + 5);
         int green = 255 - sacnServer->getChannelValue(address + 6);
         int blue = 255 - sacnServer->getChannelValue(address + 7);
+        if (type == ObjectTypes::VirtualBeam16Bit) {
+            x = (sacnServer->getChannelValue(address) * 256 + sacnServer->getChannelValue(address + 1)) * painter->window().width() / 65535;
+            y = (sacnServer->getChannelValue(address + 2) * 256 + sacnServer->getChannelValue(address + 3)) * painter->window().height() / 65535;
+            size = sacnServer->getChannelValue(address + 2) * painter->window().height() / 255;
+            diffusion = (float)sacnServer->getChannelValue(address + 5) / 255;
+            alpha = sacnServer->getChannelValue(address + 6);
+            red = 255 - sacnServer->getChannelValue(address + 7);
+            green = 255 - sacnServer->getChannelValue(address + 8);
+            blue = 255 - sacnServer->getChannelValue(address + 9);
+        }
 
         if (alpha > 0) {
             QColor color = QColor(red, green, blue, alpha);
