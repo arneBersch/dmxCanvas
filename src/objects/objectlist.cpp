@@ -29,20 +29,20 @@ QVariant ObjectList::data(const QModelIndex &index, const int role) const {
     if (row >= rowCount() || row < 0) {
         return QVariant();
     }
-    Object* object = objects[row];
+    CanvasObject* object = objects[row];
     if (column == ObjectListColumns::NameColumn) {
-        return object->name;
+        return object->getName();
     } else if (column == ObjectListColumns::AddressColumn) {
-        return (QString::number(object->address));
+        return (QString::number(object->getAddress()));
     } else if (column == ObjectListColumns::TypeColumn) {
-        if (object->type == ObjectTypes::VirtualBeam7Channel) {
-            return "Virtual Beam (7 Channels)";
-        } else if (object->type == ObjectTypes::VirtualBeam9Channel) {
-            return "Virtual Beam (9 Channels)";
-        } else if (object->type == ObjectTypes::Image5Channel) {
-            return "Image (5 Channels)";
-        } else if (object->type == ObjectTypes::Image7Channel) {
-            return "Image (7 Channels)";
+        if (object->getType() == ObjectTypes::VirtualBeam8Bit) {
+            return VIRTUAL_BEAM_8BIT;
+        } else if (object->getType() == ObjectTypes::VirtualBeam16Bit) {
+            return VIRTUAL_BEAM_16BIT;
+        } else if (object->getType() == ObjectTypes::Image8Bit) {
+            return IMAGE_8BIT;
+        } else if (object->getType() == ObjectTypes::Image16Bit) {
+            return IMAGE_16BIT;
         }
     }
     return QVariant();
@@ -52,25 +52,25 @@ bool ObjectList::setData(const QModelIndex &index, const QVariant &value, int ro
     if (index.isValid() && role == Qt::EditRole) {
         const int row = index.row();
         const int column = index.column();
-        Object* object = objects[row];
+        CanvasObject* object = objects[row];
         if (column == ObjectListColumns::NameColumn) {
-            object->name = value.toString();
+            object->setName(value.toString());
         } else if (column == ObjectListColumns::AddressColumn) {
             bool ok = false;
             int address = value.toInt(&ok);
-            if (!ok || (address < 1) || (address > 512)) {
+            if (!ok) {
                 return false;
             }
-            object->address = address;
+            object->setAddress(address);
         } else if (column == ObjectListColumns::TypeColumn) {
-            if (value.toString() == "Virtual Beam (7 Channels)") {
-                object->type = ObjectTypes::VirtualBeam7Channel;
-            } else if (value.toString() == "Virtual Beam (9 Channels)") {
-                object->type = ObjectTypes::VirtualBeam9Channel;
-            } else if (value.toString() == "Image (5 Channels)") {
-                object->type = ObjectTypes::Image5Channel;
-            } else if (value.toString() == "Image (7 Channels)") {
-                object->type = ObjectTypes::Image7Channel;
+            if (value.toString() == VIRTUAL_BEAM_8BIT) {
+                object->setType(ObjectTypes::VirtualBeam8Bit);
+            } else if (value.toString() == VIRTUAL_BEAM_16BIT) {
+                object->setType(ObjectTypes::VirtualBeam16Bit);
+            } else if (value.toString() == IMAGE_8BIT) {
+                object->setType(ObjectTypes::Image8Bit);
+            } else if (value.toString() == IMAGE_16BIT) {
+                object->setType(ObjectTypes::Image16Bit);
             }
         }
         emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
@@ -107,7 +107,7 @@ bool ObjectList::insertRows(int position, int rows, const QModelIndex &index) {
     Q_UNUSED(index);
     beginInsertRows(QModelIndex(), position, (position + rows - 1));
     for (int row = 0; row < rows; row++) {
-        Object* object = new Object();
+        CanvasObject* object = new CanvasObject();
         objects.insert(position, object);
     }
     endInsertRows();
@@ -118,10 +118,16 @@ bool ObjectList::removeRows(int position, int rows, const QModelIndex &index) {
     Q_UNUSED(index);
     beginRemoveRows(QModelIndex(), position, (position + rows - 1));
     for (int row = 0; row < rows; row++) {
-        Object* object = objects[position];
+        CanvasObject* object = objects[position];
         objects.removeAt(position);
         delete object;
     }
     endRemoveRows();
     return true;
+}
+
+void ObjectList::drawObjects(QPainter* painter, MediaSources* media, SacnServer* sacn) {
+    for (CanvasObject* object : objects) {
+        object->draw(painter, media, sacn);
+    }
 }

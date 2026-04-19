@@ -6,24 +6,40 @@
     You should have received a copy of the GNU General Public License along with dmxCanvas. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef CANVASWINDOW_H
-#define CANVASWINDOW_H
+#ifndef CANVASOBJECT_H
+#define CANVASOBJECT_H
 
 #include <QtWidgets>
 
-#include "objects/objectlist.h"
 #include "media/mediasources.h"
 #include "server/sacnserver.h"
 
-class CanvasWindow : public QWidget {
-    Q_OBJECT
+namespace ObjectTypes {
+enum ObjectType {
+    VirtualBeam8Bit,
+    VirtualBeam16Bit,
+    Image8Bit,
+    Image16Bit,
+};
+}
+
+class CanvasObject {
 public:
-    CanvasWindow(QWidget* parent, bool fullscreen, ObjectList* objectList, MediaSources *mediaSources, SacnServer* sacnServer);
-    void paintEvent(QPaintEvent *event) override;
+    CanvasObject();
+    QString getName();
+    void setName(QString name);
+    int getAddress();
+    void setAddress(int address);
+    ObjectTypes::ObjectType getType();
+    void setType(ObjectTypes::ObjectType objectType);
+    void draw(QPainter* painter, MediaSources* media, SacnServer* sacn);
+
+    static const int MIN_ADDRESS = 1;
+    static const int MAX_ADDRESS = 512;
 private:
-    ObjectList *objects;
-    MediaSources *media;
-    SacnServer *sacnServer;
+    QString name = QString();
+    int address = MIN_ADDRESS;
+    ObjectTypes::ObjectType type = ObjectTypes::VirtualBeam8Bit;
 };
 
-#endif // CANVASWINDOW_H
+#endif // CANVASOBJECT_H

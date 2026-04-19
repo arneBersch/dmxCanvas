@@ -6,20 +6,24 @@
     You should have received a copy of the GNU General Public License along with dmxCanvas. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef ADDRESSITEMDELEGATE_H
-#define ADDRESSITEMDELEGATE_H
+#ifndef SACNDATAGRAM_H
+#define SACNDATAGRAM_H
 
 #include <QtWidgets>
+#include <QtNetwork>
 
-#include "canvasobject.h"
-
-class AddressItemDelegate : public QStyledItemDelegate {
-    Q_OBJECT
+class SacnDatagram {
 public:
-    AddressItemDelegate(QObject *parent = nullptr);
-    QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    SacnDatagram(QNetworkDatagram datagram);
+    bool isValid();
+    QString getSource();
+    int getPriority();
+    int getUniverse();
+    uint8_t getChannel(int channel);
+private:
+    QByteArray data;
+    QHostAddress sourceAddress;
+    bool checkFlagsAndLength(int index);
 };
 
-#endif // ADDRESSITEMDELEGATE_H
+#endif // SACNDATAGRAM_H

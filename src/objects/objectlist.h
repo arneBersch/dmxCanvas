@@ -11,20 +11,7 @@
 
 #include <QtWidgets>
 
-namespace ObjectTypes {
-enum ObjectType {
-    VirtualBeam7Channel,
-    VirtualBeam9Channel,
-    Image5Channel,
-    Image7Channel,
-};
-}
-
-struct Object {
-    QString name = QString();
-    int address = 1;
-    ObjectTypes::ObjectType type = ObjectTypes::VirtualBeam7Channel;
-};
+#include "canvasobject.h"
 
 namespace ObjectListColumns {
 enum {
@@ -45,8 +32,13 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     bool insertRows(int position, int rows, const QModelIndex &index = QModelIndex()) override;
     bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex()) override;
+    void drawObjects(QPainter* painter, MediaSources* media, SacnServer* sacnServer);
 private:
-    QList<Object*> objects = QList<Object*>();
+    QList<CanvasObject*> objects = QList<CanvasObject*>();
+    const QString VIRTUAL_BEAM_8BIT = "Virtual Beam (8 Channels)";
+    const QString VIRTUAL_BEAM_16BIT = "Virtual Beam (10 Channels)";
+    const QString IMAGE_8BIT = "Image (5 Channels)";
+    const QString IMAGE_16BIT = "Image (7 Channels)";
 };
 
 #endif // OBJECTLIST_H

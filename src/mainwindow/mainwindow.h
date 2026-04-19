@@ -15,8 +15,7 @@
 #include "canvaswindow/canvaswindow.h"
 #include "aboutwindow/aboutwindow.h"
 #include "objects/objectlist.h"
-#include "objects/addressitemdelegate.h"
-#include "objects/objecttypeitemdelegate.h"
+#include "objects/objectmanager.h"
 #include "media/mediasources.h"
 #include "server/sacnserver.h"
 
@@ -25,24 +24,21 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 public:
     MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
 private:
-    void addObject();
-    void removeObject();
     void openWindow(bool fullscreen);
-    void openFile();
     void newFile();
+    void openFile();
     void saveFile();
     void saveFileAs();
     void reset();
     void closeEvent(QCloseEvent *event) override;
     void about();
-    ObjectList *objectList;
-    MediaSources *mediaSources;
-    SacnServer *sacnServer;
-    QTableView *objectTable;
+    ObjectList* objectList;
+    ObjectManager* objectManager;
+    MediaSources* mediaSources;
+    SacnServer* sacnServer;
     QString filename;
-    const QString VERSION = "0.1.1";
+    const QString VERSION = "0.2.0";
     const QString COPYRIGHT = "Copyright (c) 2026 Arne Bersch (zoeglfrex-dmx@web.de)";
 };
 #endif // MAINWINDOW_H

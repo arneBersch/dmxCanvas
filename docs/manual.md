@@ -6,7 +6,7 @@ You can find the DMX charts for dmxCanvas [here](dmxCharts.md).
 
 ## Input
 For setting up sACN input, you only need to set the sACN universe.
-You can check if dmxCanvas is receiving anything by checking the Received Packets text box.
+When dmxCanvas receives a sACN signal, it will show the Name and the IP Address of the Source.
 
 ## Virtual Beams
 For setting up a Virtual Beam, just follow these steps:

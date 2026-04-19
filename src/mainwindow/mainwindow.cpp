@@ -70,37 +70,21 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(openDmxChartsAction, &QAction::triggered, this, []{ QDesktopServices::openUrl(QUrl("https://github.com/arneBersch/dmxCanvas/blob/main/docs/dmxCharts.md")); });
     helpMenu->addAction(openDmxChartsAction);
 
-    connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_N), this), &QShortcut::activated, this, &MainWindow::newFile); // New File
-    connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_O), this), &QShortcut::activated, this, &MainWindow::openFile); // Open File
-    connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_S), this), &QShortcut::activated, this, &MainWindow::saveFile); // Save File
-    connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_S), this), &QShortcut::activated, this, &MainWindow::saveFileAs); // Save File As
-    connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Q), this), &QShortcut::activated, this, &MainWindow::close); // Quit Application
-    connect(new QShortcut(QKeySequence(Qt::Key_F5), this), &QShortcut::activated, this, [this]{ openWindow(true); }); // Open Canvas Fullscreen
-    connect(new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F5), this), &QShortcut::activated, this, [this]{ openWindow(false); }); // Open Canvas Window
+    new QShortcut(Qt::CTRL | Qt::Key_N, this, [this]{ newFile(); });
+    new QShortcut(Qt::CTRL | Qt::Key_O, this, [this]{ openFile(); });
+    new QShortcut(Qt::CTRL | Qt::Key_S, this, [this]{ saveFile(); });
+    new QShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_S, this, [this]{ saveFileAs(); });
+    new QShortcut(Qt::CTRL | Qt::Key_Q, this, [this]{ close(); });
+    new QShortcut(Qt::Key_F5, this, [this]{ openWindow(true); });
+    new QShortcut(Qt::SHIFT | Qt::Key_F5, this, [this]{ openWindow(false); });
 
     QTabWidget *tabs = new QTabWidget();
     tabs->setTabPosition(QTabWidget::South);
-    this->setCentralWidget(tabs);
+    setCentralWidget(tabs);
 
-    QVBoxLayout *objectsLayout = new QVBoxLayout();
-    QWidget *objects = new QWidget;
-    objects->setLayout(objectsLayout);
-    objectTable = new QTableView();
     objectList = new ObjectList();
-    objectTable->setModel(objectList);
-    objectTable->horizontalHeader()->setStretchLastSection(true);
-    objectTable->verticalHeader()->hide();
-    objectTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-    objectTable->setItemDelegateForColumn(ObjectListColumns::AddressColumn, new AddressItemDelegate(objectTable));
-    objectTable->setItemDelegateForColumn(ObjectListColumns::TypeColumn, new ObjectTypeItemDelegate(objectTable));
-    objectsLayout->addWidget(objectTable);
-    QPushButton *addObjectButton = new QPushButton("Add Object");
-    connect(addObjectButton, &QPushButton::clicked, this, &MainWindow::addObject);
-    objectsLayout->addWidget(addObjectButton);
-    QPushButton *removeObjectButton = new QPushButton("Remove Object");
-    connect(removeObjectButton, &QPushButton::clicked, this, &MainWindow::removeObject);
-    objectsLayout->addWidget(removeObjectButton);
-    tabs->addTab(objects, "Objects");
+    objectManager = new ObjectManager(objectList);
+    tabs->addTab(objectManager, "Objects");
 
     mediaSources = new MediaSources();
     tabs->addTab(mediaSources, "Media");
@@ -108,33 +92,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     sacnServer = new SacnServer();
     tabs->addTab(sacnServer, "Input");
 
-    this->show(); // Show window
-    about(); // Open about window
-}
-
-MainWindow::~MainWindow() {
-}
-
-void MainWindow::addObject() {
-    objectList->insertRows(objectList->rowCount(), 1);
-}
-
-void MainWindow::removeObject() {
-    QModelIndexList selection = objectTable->selectionModel()->selectedRows();
-    if (selection.size() <= 0) {
-        return;
-    }
-    QMessageBox messageBox;
-    messageBox.setText("Do you want to delete " + QString::number(selection.size()) + " Objects?");
-    messageBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
-    messageBox.setDefaultButton(QMessageBox::Cancel);
-    if (messageBox.exec() != QMessageBox::Ok) {
-        return;
-    }
-    std::sort(selection.begin(), selection.end(), [](QModelIndex a, QModelIndex b) { return a.row() > b.row(); });
-    for (QModelIndex index : selection) {
-        objectList->removeRows(index.row(), 1);
-    }
+    show();
+    about();
 }
 
 void MainWindow::openWindow(bool fullscreen) {
@@ -146,6 +105,7 @@ void MainWindow::openFile() {
     if (newFileName.isEmpty()) {
         return;
     }
+
     QFile file(newFileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QMessageBox errorBox;
@@ -153,7 +113,9 @@ void MainWindow::openFile() {
         errorBox.exec();
         return;
     }
+
     reset();
+
     QXmlStreamReader fileStream(&file);
     if ((fileStream.readNextStartElement()) && (fileStream.name().toString() == "Workspace")) {
         while (fileStream.readNextStartElement()) {
@@ -203,32 +165,35 @@ void MainWindow::openFile() {
                             errorBox.exec();
                             return;
                         }
-                        sacnServer->universeSpinBox->setValue(universe);
+                        sacnServer->setUniverse(universe);
                     }
                 }
             }
         }
     }
+
     filename = newFileName;
+
     if (fileStream.hasError()) {
         QMessageBox errorBox;
-        errorBox.setText("Can't open file because a XML passing error occured in line " + QString::number(fileStream.lineNumber()) + ": " + fileStream.errorString() + " (" + QString::number(fileStream.error()) + ")");
+        errorBox.setText("Can't open File because a XML parsing Error occured in Line " + QString::number(fileStream.lineNumber()) + ": " + fileStream.errorString() + " (" + QString::number(fileStream.error()) + ")");
         errorBox.exec();
         return;
     }
-    qDebug() << "Opened file " << filename;
+
+    qDebug() << "Opened File " << filename;
 }
 
 void MainWindow::newFile() {
     QMessageBox messageBox;
-    messageBox.setText("Are you sure you want to open a new file?");
+    messageBox.setText("Are you sure you want to open a new File?");
     messageBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
     messageBox.setDefaultButton(QMessageBox::Cancel);
     if (messageBox.exec() != QMessageBox::Ok) {
         return;
     }
     reset();
-    qDebug() << "Opened new file.";
+    qDebug() << "Opened new File.";
 }
 
 void MainWindow::saveFile() {
@@ -236,19 +201,21 @@ void MainWindow::saveFile() {
         QString filenameFilter = "dmxc Files (*.dmxc)";
         filename = QFileDialog::getSaveFileName(this, "Save File", QString(), filenameFilter, &filenameFilter);
         if (filename.isEmpty()) {
-            return; // don't save if no valid file name was given
+            return;
         }
         if (!filename.endsWith(".dmxc")) {
             filename += ".dmxc";
         }
     }
+
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly)) {
         QMessageBox errorBox;
-        errorBox.setText("Unable to save file.");
+        errorBox.setText("Unable to save File.");
         errorBox.exec();
         return;
     }
+
     QXmlStreamWriter fileStream(&file);
     fileStream.setAutoFormatting(true);
     fileStream.writeStartDocument();
@@ -270,16 +237,16 @@ void MainWindow::saveFile() {
     fileStream.writeEndElement();
 
     fileStream.writeStartElement("Media");
-    fileStream.writeTextElement("Images", mediaSources->imageDirectory);
+    fileStream.writeTextElement("Images", mediaSources->getImageDirectory());
     fileStream.writeEndElement();
 
     fileStream.writeStartElement("Input");
-    fileStream.writeTextElement("Universe", QString::number(sacnServer->universeSpinBox->value()));
+    fileStream.writeTextElement("Universe", QString::number(sacnServer->getUniverse()));
     fileStream.writeEndElement();
 
     fileStream.writeEndElement();
     fileStream.writeEndDocument();
-    qDebug() << "Saved file" << filename;
+    qDebug() << "Saved File" << filename;
 }
 
 void MainWindow::saveFileAs() {
@@ -290,7 +257,7 @@ void MainWindow::saveFileAs() {
 void MainWindow::reset() {
     objectList->removeRows(0, objectList->rowCount(), QModelIndex());
     mediaSources->resetSources();
-    sacnServer->universeSpinBox->setValue(sacnServer->SACN_MIN_UNIVERSE);
+    sacnServer->reset();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {

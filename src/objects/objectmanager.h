@@ -6,20 +6,24 @@
     You should have received a copy of the GNU General Public License along with dmxCanvas. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef ADDRESSITEMDELEGATE_H
-#define ADDRESSITEMDELEGATE_H
+#ifndef OBJECTMANAGER_H
+#define OBJECTMANAGER_H
 
 #include <QtWidgets>
 
-#include "canvasobject.h"
+#include "objectlist.h"
+#include "addressitemdelegate.h"
+#include "objecttypeitemdelegate.h"
 
-class AddressItemDelegate : public QStyledItemDelegate {
+class ObjectManager : public QWidget {
     Q_OBJECT
 public:
-    AddressItemDelegate(QObject *parent = nullptr);
-    QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    ObjectManager(ObjectList* objectList, QWidget* parent = nullptr);
+private:
+    void addObject();
+    void removeObject();
+    ObjectList* objectList;
+    QTableView *objectTable;
 };
 
-#endif // ADDRESSITEMDELEGATE_H
+#endif // OBJECTMANAGER_H

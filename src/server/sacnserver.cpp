@@ -19,72 +19,41 @@ SacnServer::SacnServer() {
     connect(universeSpinBox, &QSpinBox::valueChanged, this, &SacnServer::setUniverse);
     layout->addWidget(universeSpinBox, 0, 1);
 
-    QLabel *receivedPacketsLabel = new QLabel("Received Packets");
-    layout->addWidget(receivedPacketsLabel, 2, 0);
-    packetsCounterLabel = new QLabel(QString::number(receivedPackets));
-    layout->addWidget(packetsCounterLabel, 2, 1);
+    QLabel *statusLabel = new QLabel("Status");
+    layout->addWidget(statusLabel, 1, 0);
+    sourceLabel = new QLabel();
+    layout->addWidget(sourceLabel, 1, 1);
 
-    setUniverse(SACN_MIN_UNIVERSE);
+    layout->setRowStretch(2, 1);
+
+    dataLossTimer = new QTimer();
+    dataLossTimer->setSingleShot(true);
+    connect(dataLossTimer, &QTimer::timeout, this, &SacnServer::dataLoss);
+
+    dataLoss();
+    reset();
+}
+
+void SacnServer::dataLoss() {
+    priority = SACN_MIN_PRIORITY;
+
+    sourceLabel->setText("Not Connected");
+    sourceLabel->setStyleSheet("* { background-color: red; }");
 }
 
 void SacnServer::processPendingDatagrams() {
     while (socket->hasPendingDatagrams()) {
-        QByteArray data = socket->receiveDatagram().data();
-        if ((data.size() >= 125)
-            && (data.size() <= 638)
-            // ROOT LAYER
-            // Preamble Size
-            && (data[0] == (char)0x00)
-            && (data[1] == (char)0x10)
-            // Post-amble Size
-            && (data[2] == (char)0x00)
-            && (data[3] == (char)0x00)
-            // ACN Packet Identifier
-            && (data[4] == (char)0x41)
-            && (data[5] == (char)0x53)
-            && (data[6] == (char)0x43)
-            && (data[7] == (char)0x2d)
-            && (data[8] == (char)0x45)
-            && (data[9] == (char)0x31)
-            && (data[10] == (char)0x2e)
-            && (data[11] == (char)0x31)
-            && (data[12] == (char)0x37)
-            && (data[13] == (char)0x00)
-            && (data[14] == (char)0x00)
-            && (data[15] == (char)0x00)
-            // Vector
-            && (data[18] == (char)0x00)
-            && (data[19] == (char)0x00)
-            && (data[20] == (char)0x00)
-            && (data[21] == (char)0x04)
-            // FRAMING LAYER
-            // Vector
-            && (data[40] == (char)0x00)
-            && (data[41] == (char)0x00)
-            && (data[42] == (char)0x00)
-            && (data[43] == (char)0x02)
-            // Universe
-            && (((256 * (uint8_t)data[113]) + (uint8_t)data[114]) == universeSpinBox->value())
-            // DMP LAYER
-            // Vector
-            && (data[117] == (char)0x02)
-            // Address Type & Data Type
-            && (data[118] == (char)0xa1)
-            // First Property Address
-            && (data[119] == (char)0x00)
-            && (data[120] == (char)0x00)
-            // Address Increment
-            && (data[121] == (char)0x00)
-            && (data[122] == (char)0x01)) {
-            receivedPackets++;
-            for (int channel = 0; channel < 511; channel++) {
-                if (channel <= (data.length() - 127)) {
-                    dmxData[channel] = data[126 + channel];
-                } else {
-                    dmxData[channel] = 0;
-                }
+        SacnDatagram datagram = SacnDatagram(socket->receiveDatagram());
+
+        if (datagram.isValid() && (datagram.getUniverse() == universeSpinBox->value())) {
+            if (datagram.getPriority() >= priority) {
+                lastDatagram = datagram;
+                priority = datagram.getPriority();
+                sourceLabel->setText("Connected: " + datagram.getSource());
+                sourceLabel->setStyleSheet("* { background-color: green; }");
+
+                dataLossTimer->start(SACN_NETWORK_DATA_LOSS_TIMEOUT);
             }
-            packetsCounterLabel->setText(QString::number(receivedPackets));
         } else {
             qDebug() << "Received invalid data.";
         }
@@ -92,23 +61,43 @@ void SacnServer::processPendingDatagrams() {
 }
 
 void SacnServer::setUniverse(int universe) {
-    QString address = "239.255.";
-    address += QString::number(universe / 256);
-    address += ".";
-    address += QString::number(universe % 256);
+    if (universe < SACN_MIN_UNIVERSE || universe > SACN_MAX_UNIVERSE) {
+        return;
+    }
+
+    if (universeSpinBox->value() != universe) {
+        universeSpinBox->setValue(universe);
+    }
+
+    const QHostAddress address = QHostAddress(SACN_ADDRESS_FORMAT.arg(universe / 256).arg(universe % 256));
+
     delete socket;
     socket = new QUdpSocket();
     socket->bind(QHostAddress::AnyIPv4, SACN_PORT);
     for (QNetworkInterface interface : QNetworkInterface::allInterfaces()) {
-        socket->joinMulticastGroup(QHostAddress(address), interface);
+        socket->joinMulticastGroup(address, interface);
     }
     connect(socket, &QUdpSocket::readyRead, this, &SacnServer::processPendingDatagrams);
-    qDebug() << "Set sACN Universe to " << universe << " and Multicast address to " << address << ".";
+
+    qDebug() << "Set sACN Universe to " << universe << " and Multicast address to " << address.toString() << ".";
+}
+
+int SacnServer::getUniverse() {
+    return universeSpinBox->value();
+}
+
+void SacnServer::reset() {
+    setUniverse(SACN_MIN_UNIVERSE);
 }
 
 uint8_t SacnServer::getChannelValue(int channel) {
-    if ((channel < 1) || (channel > 512)) {
-        return 0;
-    }
-    return dmxData[channel - 1];
+    return lastDatagram.getChannel(channel);
+}
+
+float SacnServer::get8BitChannelRatio(int channel) {
+    return (float)getChannelValue(channel) / 255;
+}
+
+float SacnServer::get16BitChannelRatio(int channel) {
+    return (float)(getChannelValue(channel) * 256 + getChannelValue(channel + 1)) / 65535;
 }
