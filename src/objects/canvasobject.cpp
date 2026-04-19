@@ -51,7 +51,7 @@ void CanvasObject::draw(QPainter* painter, MediaSources* media, SacnServer* sacn
         if (type == ObjectTypes::VirtualBeam16Bit) {
             x = (sacnServer->getChannelValue(address) * 256 + sacnServer->getChannelValue(address + 1)) * painter->window().width() / 65535;
             y = (sacnServer->getChannelValue(address + 2) * 256 + sacnServer->getChannelValue(address + 3)) * painter->window().height() / 65535;
-            size = sacnServer->getChannelValue(address + 2) * painter->window().height() / 255;
+            size = sacnServer->getChannelValue(address + 4) * painter->window().height() / 255;
             diffusion = (float)sacnServer->getChannelValue(address + 5) / 255;
             alpha = sacnServer->getChannelValue(address + 6);
             red = 255 - sacnServer->getChannelValue(address + 7);
@@ -90,7 +90,7 @@ void CanvasObject::draw(QPainter* painter, MediaSources* media, SacnServer* sacn
             QDir directory = QDir(media->getImageDirectory());
             if (directory.exists()) {
                 QStringList images = directory.entryList(QDir::Files);
-                foreach(QString fileName, images) {
+                for (QString fileName : images) {
                     bool isNumber = false;
                     int number = fileName.split(".")[0].toInt(&isNumber);
                     if (isNumber && (number == imageIndex)) {
@@ -99,7 +99,7 @@ void CanvasObject::draw(QPainter* painter, MediaSources* media, SacnServer* sacn
                 }
             }
             if (!imagePath.isEmpty()) {
-                QImage image(imagePath);
+                QImage image = QImage(imagePath);
                 if (!image.isNull()) {
                     QImage alphaImage = QImage(image);
                     QPainter alphaPainter = QPainter(&alphaImage);

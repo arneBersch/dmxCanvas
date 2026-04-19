@@ -1,7 +1,7 @@
 # DMX Charts for dmxCanvas
 
 ## Virtual Beam
-### 7 Channel Mode
+### 8 Channel Mode
 * Channel 1: Pan
 * Channel 2: Tilt
 * Channel 3: Zoom
@@ -11,7 +11,7 @@
 * Channel 7: Magenta
 * Channel 8: Yellow
 
-### 9 Channel Mode
+### 10 Channel Mode
 * Channel 1: Pan
 * Channel 2: Pan fine
 * Channel 3: Tilt
