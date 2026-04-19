@@ -20,6 +20,8 @@ public:
     SacnServer();
     void reset();
     uint8_t getChannelValue(int channel);
+    float get8BitChannelRatio(int channel);
+    float get16BitChannelRatio(int channel);
     void setUniverse(int newUniverse);
     int getUniverse();
 private slots:

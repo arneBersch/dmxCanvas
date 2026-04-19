@@ -40,27 +40,30 @@ void CanvasObject::setType(ObjectTypes::ObjectType objectType) {
 
 void CanvasObject::draw(QPainter* painter, MediaSources* media, SacnServer* sacnServer) {
     if (type == ObjectTypes::VirtualBeam8Bit || type == ObjectTypes::VirtualBeam16Bit) {
-        int x = sacnServer->getChannelValue(address) * painter->window().width() / 255;
-        int y = sacnServer->getChannelValue(address + 1) * painter->window().height() / 255;
-        int size = sacnServer->getChannelValue(address + 2) * painter->window().height() / 255;
-        float diffusion = (float)sacnServer->getChannelValue(address + 3) / 255;
+        float x = sacnServer->get8BitChannelRatio(address);
+        float y = sacnServer->get8BitChannelRatio(address + 1);
+        float size = sacnServer->get8BitChannelRatio(address + 2);
+        float diffusion = sacnServer->get8BitChannelRatio(address + 3);
         int alpha = sacnServer->getChannelValue(address + 4);
-        int red = 255 - sacnServer->getChannelValue(address + 5);
-        int green = 255 - sacnServer->getChannelValue(address + 6);
-        int blue = 255 - sacnServer->getChannelValue(address + 7);
+        int cyan = sacnServer->getChannelValue(address + 5);
+        int magenta = sacnServer->getChannelValue(address + 6);
+        int yellow = sacnServer->getChannelValue(address + 7);
         if (type == ObjectTypes::VirtualBeam16Bit) {
-            x = (sacnServer->getChannelValue(address) * 256 + sacnServer->getChannelValue(address + 1)) * painter->window().width() / 65535;
-            y = (sacnServer->getChannelValue(address + 2) * 256 + sacnServer->getChannelValue(address + 3)) * painter->window().height() / 65535;
-            size = sacnServer->getChannelValue(address + 4) * painter->window().height() / 255;
-            diffusion = (float)sacnServer->getChannelValue(address + 5) / 255;
+            x = sacnServer->get16BitChannelRatio(address);
+            y = sacnServer->get16BitChannelRatio(address + 2);
+            size = sacnServer->get8BitChannelRatio(address + 4);
+            diffusion = sacnServer->get8BitChannelRatio(address + 5);
             alpha = sacnServer->getChannelValue(address + 6);
-            red = 255 - sacnServer->getChannelValue(address + 7);
-            green = 255 - sacnServer->getChannelValue(address + 8);
-            blue = 255 - sacnServer->getChannelValue(address + 9);
+            cyan = sacnServer->getChannelValue(address + 7);
+            magenta = sacnServer->getChannelValue(address + 8);
+            yellow = sacnServer->getChannelValue(address + 9);
         }
+        x *= painter->window().width();
+        y *= painter->window().height();
+        size *= std::min(painter->window().width(), painter->window().height());
 
         if (alpha > 0) {
-            QColor color = QColor(red, green, blue, alpha);
+            QColor color = QColor(255 - cyan, 255 - magenta, 255 - yellow, alpha);
             if (diffusion > 0) {
                 QRadialGradient gradient(x, y, size / 2);
                 gradient.setColorAt(1 - diffusion, color);
@@ -72,18 +75,21 @@ void CanvasObject::draw(QPainter* painter, MediaSources* media, SacnServer* sacn
             painter->drawEllipse((x - (size / 2)), (y - (size / 2)), size, size);
         }
     } else if (type == ObjectTypes::Image8Bit || type == ObjectTypes::Image16Bit) {
-        int x = sacnServer->getChannelValue(address) * painter->window().width() / 255;
-        int y = sacnServer->getChannelValue(address + 1) * painter->window().height() / 255;
-        int size = sacnServer->getChannelValue(address + 2) * painter->window().height() / 255;
+        float x = sacnServer->get8BitChannelRatio(address);
+        float y = sacnServer->get8BitChannelRatio(address + 1);
+        float size = sacnServer->get8BitChannelRatio(address + 2);
         int alpha = sacnServer->getChannelValue(address + 3);
         int imageIndex = sacnServer->getChannelValue(address + 4);
         if (type == ObjectTypes::Image16Bit) {
-            x = (sacnServer->getChannelValue(address) * 256 + sacnServer->getChannelValue(address + 1)) * painter->window().width() / 65535;
-            y = (sacnServer->getChannelValue(address + 2) * 256 + sacnServer->getChannelValue(address + 3)) * painter->window().height() / 65535;
-            size = sacnServer->getChannelValue(address + 4) * painter->window().height() / 255;
+            x = sacnServer->get16BitChannelRatio(address);
+            y = sacnServer->get16BitChannelRatio(address + 2);
+            size = sacnServer->get8BitChannelRatio(address + 4);
             alpha = sacnServer->getChannelValue(address + 5);
             imageIndex = sacnServer->getChannelValue(address + 6);
         }
+        x *= painter->window().width();
+        y *= painter->window().height();
+        size *= std::min(painter->window().width(), painter->window().height());
 
         if (alpha > 0) {
             QString imagePath = QString();

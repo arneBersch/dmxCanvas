@@ -93,3 +93,11 @@ void SacnServer::reset() {
 uint8_t SacnServer::getChannelValue(int channel) {
     return lastDatagram.getChannel(channel);
 }
+
+float SacnServer::get8BitChannelRatio(int channel) {
+    return (float)getChannelValue(channel) / 255;
+}
+
+float SacnServer::get16BitChannelRatio(int channel) {
+    return (float)(getChannelValue(channel) * 256 + getChannelValue(channel + 1)) / 65535;
+}
